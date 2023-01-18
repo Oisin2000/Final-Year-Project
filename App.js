@@ -7,7 +7,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>The Film Club</Text>
+      <Text>Test</Text>
       <StatusBar style="auto" />
     </View>
   );
