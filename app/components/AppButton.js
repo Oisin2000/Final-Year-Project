@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-function AppButton({title, onPress}) {
+function AppButton({title, onPress, color="white"}) {
     return (
 
-        <TouchableOpacity style={styles.button} onPress={onPress}>
+        <TouchableOpacity style={[styles.button,{backgroundColor:color}]} onPress={onPress}>
 
 
         <Text style={styles.text}>{title}</Text>
@@ -23,7 +23,8 @@ button: {
     justifyContent: "center",
     alignItems:"center",
     padding:15,
-    width:300,
+    width:"100%",
+    marginVertical:5
 },
 text: {
 
