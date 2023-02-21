@@ -43,13 +43,28 @@ function SearchScreen(props) {
             })
         })
     }
+    const addToUserMovies = (movie) => {
+        // Make an API request to add the movie to the user's list
+        console.log(movie);
+        axios.post('/api/addMovie', {
+          title: movie.Title,
+          poster: movie.Poster,
+          
+           // Replace with the current user's ID
+        }).then((response) => {
+          // If the API call was successful, update the userMovies state variable
+          setUserMovies([...userMovies, response.data]);
+        }).catch((error) => {
+          // If the API call failed, log the error
+          console.error(error);
+        });
+      };
 
 
     return (
         
         <View style = {styles.container}>
 
-            <Text style={StyleSheet.title}>Movie DB</Text>
             <TextInput 
             
             style = {styles.searchbox}
@@ -80,9 +95,13 @@ function SearchScreen(props) {
                         resizeMode="cover"
                         />
                         <Text style={styles.heading}>{result.Title}</Text>
+                        <Text style={styles.AddtoMyList} onPress={() => addToUserMovies(state.selected)}>Add to My Movies</Text>
+                        
+                        
                     </View>
-
+                    
                     </TouchableHighlight>
+                    
                 ))}
 
             </ScrollView>
@@ -96,16 +115,21 @@ function SearchScreen(props) {
                 <SafeAreaView style={styles.popup}>
 
                 <Text style={styles.poptitle}>{state.selected.Title}</Text>
-                <Text style={{padding:20,marginBottom:20}}>Rating: {state.selected.imdbRating}</Text>
-                <Text style={{padding:20}} >Plot: {state.selected.Plot}</Text>
+                <Text style={styles.results}>Rating: {state.selected.imdbRating}</Text>
+                <Text style={styles.results} >Cast: {state.selected.Actors}</Text>
+                <Text style={styles.results} >Director: {state.selected.Director}</Text>
+                <Text style={styles.results} >Genre: {state.selected.Genre}</Text>
+                <Text style={styles.results} >Plot: {state.selected.Plot}</Text>
+                <Text style={styles.results} >Awards: {state.selected.Awards}</Text>
                 </SafeAreaView>
-                <AppButton title="Close" color='#2484C4' onPress={() => setState(prevState => {
+                <View style={styles.buttonContainer}>
+                <AppButton title="Close"   onPress={() => setState(prevState => {
 
                 return {...prevState, selected: {} }
 
                 })}/>
                     
-                
+                    </View>
 
 
                 
@@ -120,18 +144,27 @@ const styles = StyleSheet.create({
 
     container: {
 
-        flex:1,
-        backgroundColor: '#223343',
+        flex:10,
+        backgroundColor: '#750a18',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingTop: 70,
+        justifyContent: 'flex-end',
+        paddingTop: 100,
         paddingHorizontal: 20,
+    },
+
+    buttonContainer:{
+
+        backgroundColor: '#750a18',
+        padding:20,
+       
+        width:"100%",
+        justifyContent:'flex-end'
     },
 
 
     title: {
         color: '#FFF',
-        fontSize: 32,
+        fontSize: 50,
         fontWeight: '700',
         textAlign: 'center',
         marginBottom: 20
@@ -152,8 +185,12 @@ const styles = StyleSheet.create({
 
     results: {
 
-        flex:1,
-
+        color: '#000000',
+        fontSize: 22,
+        fontWeight: '600',
+        textAlign: 'left',
+        marginBottom: 20,
+        padding: 20,
 
     },
 
@@ -172,13 +209,28 @@ const styles = StyleSheet.create({
         fontSize:18,
         fontWeight: "700",
         padding:20,
-        backgroundColor:"#445565"
+        textAlign:'center',
+        backgroundColor:"#000000"
+
+    },
+
+    AddtoMyList: {
+
+        color:"#000000",
+        fontSize:18,
+        fontWeight: "700",
+        padding:20,
+        textAlign:'center',
+        backgroundColor:"#FFF"
 
     },
 
     popup: {
 
+        flex:1,
         padding:20,
+        justifyContent: "flex-start",
+        backgroundColor: '#750a18',
         
 
     },
@@ -187,8 +239,9 @@ const styles = StyleSheet.create({
 
         fontSize:25,
         fontWeight:"700",
-        marginBottom: 5,
-        
+        marginTop:10,
+        marginBottom: 10,
+        alignSelf: 'center',
 
     },
 
