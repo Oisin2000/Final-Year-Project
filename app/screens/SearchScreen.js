@@ -11,7 +11,8 @@ function SearchScreen(props) {
 
         s: "Enter a movie ...",
         results: [],
-        selected: {}
+        selected: {},
+        userMovies: [],
 
     });
 
@@ -28,37 +29,41 @@ function SearchScreen(props) {
 
     }
 
-    const openPopup = id => {
+    const [result, setResult] = useState(null);
 
-        axios(apiurl + "&t=" + id).then(({ data }) => {
-
-            let result = data;
-
-            console.log(result);
-
-            setState(prevState => {
-                return {...prevState, selected: result}
-            
-
-            })
+    const openPopup = (id) => {
+      axios(apiurl + "&t=" + id)
+        .then(({ data }) => {
+          setResult(data);
+          setState((prevState) => {
+            return { ...prevState, selected: data };
+          });
         })
-    }
-    const addToUserMovies = (movie) => {
-        // Make an API request to add the movie to the user's list
-        console.log(movie);
-        axios.post('/api/addMovie', {
-          title: movie.Title,
-          poster: movie.Poster,
-          
-           // Replace with the current user's ID
-        }).then((response) => {
-          // If the API call was successful, update the userMovies state variable
-          setUserMovies([...userMovies, response.data]);
-        }).catch((error) => {
-          // If the API call failed, log the error
+        .catch((error) => {
           console.error(error);
         });
-      };
+    };
+    
+    const handleAddMovie = () => {
+
+        const { imdb_votes, ...data } = result;
+
+      fetch('http://192.168.0.22:5000/save-movie-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(result),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Movie data saved:', data);
+        })
+        .catch(error => {
+          console.error('Error saving movie data:', error);
+        });
+    };
+
 
 
     return (
@@ -95,7 +100,7 @@ function SearchScreen(props) {
                         resizeMode="cover"
                         />
                         <Text style={styles.heading}>{result.Title}</Text>
-                        <Text style={styles.AddtoMyList} onPress={() => addToUserMovies(state.selected)}>Add to My Movies</Text>
+                        
                         
                         
                     </View>
@@ -123,6 +128,7 @@ function SearchScreen(props) {
                 <Text style={styles.results} >Awards: {state.selected.Awards}</Text>
                 </SafeAreaView>
                 <View style={styles.buttonContainer}>
+                <AppButton title="Add to my movies"   onPress={() => {handleAddMovie()}}/>
                 <AppButton title="Close"   onPress={() => setState(prevState => {
 
                 return {...prevState, selected: {} }
