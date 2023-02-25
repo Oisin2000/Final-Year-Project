@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, TouchableHighlight, TouchableOpacity , Button  
 import AppButton from './app/components/AppButton';
 import WelcomeScreen from './app/screens/WelcomeScreen';
 import SearchScreen from './app/screens/SearchScreen';
+import MyMoviesScreen from './app/screens/MyMoviesScreen';
 
 
 export default function App() {
@@ -11,7 +12,7 @@ export default function App() {
 
   return (
   
-  <SearchScreen/>
+  <MyMoviesScreen/>
   
 
   )
