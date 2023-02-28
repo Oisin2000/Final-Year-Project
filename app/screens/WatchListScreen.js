@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-web';
 import AppButton from '../components/AppButton';
 import axios from 'axios';
 
-function MyMoviesScreen(props) {
+function WatchListScreen(props) {
 
     const apiurl = "http://www.omdbapi.com/?i=tt3896198&apikey=99fcef07"
   
@@ -34,10 +34,10 @@ function MyMoviesScreen(props) {
     const [movies, setMovies] = useState([]);
   
     useEffect(() => {
-      fetch('http://172.20.10.2:5000/mymovies')
+      fetch('http://172.20.10.2:5000/watchlist')
         .then(response => response.json())
         .then(data => {
-          console.log('All movies:', data);
+          console.log('All WatchList movies:', data);
           setMovies(data);
           setState((prevState) => {
             return { ...prevState, results: data };
@@ -51,7 +51,7 @@ function MyMoviesScreen(props) {
     return (
       <View style={styles.container}>
   
-        <Text style={styles.title}>My Movies</Text>
+        <Text style={styles.title}>My WatchList</Text>
   
         <ScrollView style={styles.results}>
           {state.results.map(result => (
@@ -213,4 +213,4 @@ const styles = StyleSheet.create({
     
 })
 
-export default MyMoviesScreen;
+export default WatchListScreen;

@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TouchableHighlight, TextInput, ScrollView, Image, Modal, SafeAreaView } from 'react-native';
+import { View, StyleSheet, Text, TouchableHighlight, TextInput, ScrollView, Image, Modal, SafeAreaView , Alert} from 'react-native';
 import axios from 'axios';
 import AppButton from '../components/AppButton';
+import * as Progress from 'react-native-progress';
+import AddingScreen from '../screens/AddingScreen'
 
 function SearchScreen(props) {
+
+    const [showAddingScreen, setShowAddingScreen] = useState(false);
+
 
     const apiurl = "http://www.omdbapi.com/?i=tt3896198&apikey=99fcef07"
 
@@ -46,9 +51,10 @@ function SearchScreen(props) {
     
     const handleAddMovie = () => {
 
+
         const { imdb_votes, ...data } = result;
 
-      fetch('http://192.168.0.22:5000/save-movie-data', {
+      fetch('http://172.20.10.2:5000/save-movie-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -58,10 +64,42 @@ function SearchScreen(props) {
         .then(response => response.json())
         .then(data => {
           console.log('Movie data saved:', data);
+          
         })
         .catch(error => {
           console.error('Error saving movie data:', error);
         });
+
+    
+       
+    };
+
+
+    const handleAddWatchList = () => {
+
+       
+
+        const { imdb_votes, ...data } = result;
+
+      fetch('http://172.20.10.2:5000/watchlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(result),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Movie data saved:', data);
+          
+        })
+        .catch(error => {
+          console.error('Error saving movie data:', error);
+        });
+
+
+
+       
     };
 
 
@@ -82,6 +120,7 @@ function SearchScreen(props) {
             />
 
             <ScrollView style={styles.results}>
+
 
                 {state.results.map(result => (
 
@@ -128,7 +167,9 @@ function SearchScreen(props) {
                 <Text style={styles.results} >Awards: {state.selected.Awards}</Text>
                 </SafeAreaView>
                 <View style={styles.buttonContainer}>
-                <AppButton title="Add to my movies"   onPress={() => {handleAddMovie()}}/>
+                <AppButton title="Add to my movies"   onPress={() => {handleAddMovie()} }/>
+                <AppButton title="Add to my watchlist"   onPress={() => {handleAddWatchList()} }/>
+                
                 <AppButton title="Close"   onPress={() => setState(prevState => {
 
                 return {...prevState, selected: {} }

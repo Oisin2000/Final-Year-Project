@@ -24,7 +24,8 @@ button: {
     alignItems:"center",
     padding:15,
     width:"100%",
-    marginVertical:5
+    marginVertical:10,
+    
 },
 text: {
 

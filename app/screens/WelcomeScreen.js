@@ -2,7 +2,8 @@ import React from 'react';
 import { ImageBackground, StyleSheet, View, Image, Text } from 'react-native';
 import AppButton from '../components/AppButton';
 
-function WelcomeScreen(props) {
+
+function WelcomeScreen({navigation}) {
     return (
 
         <ImageBackground 
@@ -12,14 +13,14 @@ function WelcomeScreen(props) {
         >
 
         <View style={styles.logoContainer}>
-        <Image style = {styles.logo} source={require('../assets/logo.png')}/>
+        <Image style = {styles.logo} source={require('../assets/icon-white.png')}/>
         <Text style={styles.title}>The Film Club</Text>
         </View>
 
         <View style = {styles.buttonContainer}>
 
-            <AppButton title="Login" onPress={() => console.log("Tapped")}/>
-            <AppButton title="Register" color="#d62230" onPress={() => console.log(" R Tapped")}/>
+            <AppButton title="Login" onPress={() => navigation.navigate("Login")}/>
+            <AppButton title="Register" color="#d62230" onPress={() => navigation.navigate("Register")}/>
 
         </View>
 
@@ -44,12 +45,13 @@ const styles = StyleSheet.create({
     logo: {
         width: 100,
         height: 100,
-        backgroundColor: "white"
+        
         
     },
     buttonContainer:{
         padding:20,
-        width:"100%"
+        width:"100%",
+        marginBottom:30
     },
    
     logoContainer:{
