@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useContext, useState} from 'react';
 import { Image, SafeAreaView, StyleSheet, Text } from 'react-native';
 import AppButton from '../components/AppButton';
 import AppTextInput from '../components/AppTextInput';
@@ -9,6 +9,8 @@ import AppErrorMessage from '../components/AppErrorMessage';
 import AppFormField from '../components/AppFormField';
 import SubmitButton from '../components/SubmitButton';
 import AppForm from '../components/AppForm';
+import authApi from '../api/auth'
+import { AuthContext } from '../../context/AuthContext';
 
 
 const validationSchema = Yup.object().shape({
@@ -19,6 +21,11 @@ const validationSchema = Yup.object().shape({
 
 
 function LoginScreen(props) {
+
+    const [email, setEmail] = useState(null);
+    const [password, setPassword] = useState(null);
+
+    const {login} = useContext(AuthContext);
 
 
 
@@ -46,6 +53,8 @@ function LoginScreen(props) {
                         name="email"
                         placeholder="Email"
                         textContentType="emailAdress"
+                        value={email}
+                        onChangeText={text => setEmail(text)}
                         />
 
                         <AppFormField
@@ -56,10 +65,14 @@ function LoginScreen(props) {
                         secureTextEntry
                         placeholder="Password"
                         textContentType="password"
+                        value={password}
+                        onChangeText={text => setPassword(text)}
                         />
                         
 
-                        <SubmitButton title="Login"  />
+                        <AppButton title="Login" color='#bc1111' onPress={() => {login(email, password)}} />
+
+                        
                     
                     
 

@@ -1,10 +1,14 @@
-import React from 'react';
-import { SafeAreaView, StyleSheet, Text, Image } from 'react-native';
+import React, {useContext, useState} from 'react';
+import { SafeAreaView, StyleSheet, Text, Image, Modal, View, Button } from 'react-native';
 import * as Yup from 'yup';
 import AppFormField from '../components/AppFormField';
 import SubmitButton from '../components/SubmitButton';
 import AppForm from '../components/AppForm';
-
+import axios from 'axios';
+import { AuthContext } from '../../context/AuthContext';
+import AppButton from '../components/AppButton';
+import { useNavigation } from '@react-navigation/native';
+import AppModal from '../components/AppModal';
 
 const validationSchema = Yup.object().shape({
 
@@ -14,68 +18,77 @@ const validationSchema = Yup.object().shape({
 
 })
 
-
 function RegisterScreen(props) {
 
+const [email, setEmail] = useState(null);
+const [password, setPassword] = useState(null);
 
+const {register} = useContext(AuthContext);
+const [showModal, setShowModal] = useState(false);
 
+const navigation = useNavigation(); // Get navigation object
 
-    return (
+  const handleRegister = async () => {
+    try {
+      await register(email, password);
+      setShowModal(true);
+    } catch (error) {
+      console.log('Registration error', error);
+    }
+  }
 
-        <SafeAreaView style={styles.container}>
+  const handleOkPress = () => {
+    setShowModal(false);
+    navigation.navigate('Login');
+  };
 
-            <Text style={styles.title}>The Film Club</Text>
-            <Image style={styles.logo} source={require("../assets/icon-red.png")}/>
-            
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>The Film Club</Text>
+      <Image style={styles.logo} source={require("../assets/icon-red.png")} />
 
-            <AppForm
-                initialValues={{name: '', email: '', password: '' }}
-                onSubmit={values => console.log(values)}
-                validationSchema={validationSchema}
-            >
+      <AppForm
+        initialValues={{ name: '', email: '', password: '' }}
+        onSubmit={values => console.log(values)}
+        validationSchema={validationSchema}
+      >
+        <AppFormField
+          autoCapitalize="none"
+          autoCorrect={false}
+          icon="account"
+          name="name"
+          placeholder="Name"
+          textContentType="name"
+        />
+        <AppFormField
+          autoCapitalize="none"
+          autoCorrect={false}
+          icon="email"
+          keyboardType="email-address"
+          name="email"
+          placeholder="Email"
+          textContentType="emailAdress"
+          value={email}
+          onChangeText={text => setEmail(text)}
+        />
+        <AppFormField
+          autoCapitalize="none"
+          autoCorrect={false}
+          icon="lock"
+          name="password"
+          secureTextEntry
+          placeholder="Password"
+          textContentType="password"
+          value={password}
+          onChangeText={text => setPassword(text)}
+        />
+        <AppButton style={styles.button} title="Register" color='#bc1111' onPress= {handleRegister}/>
+      </AppForm>
 
-                
-                        <AppFormField
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        icon="account"
-                        name="name"
-                        placeholder="Name"
-                        textContentType="name"
-                        />
-                        <AppFormField
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        icon="email"
-                        keyboardType="email-address"
-                        name="email"
-                        placeholder="Email"
-                        textContentType="emailAdress"
-                        />
+      {showModal && <AppModal visible={showModal} animationType="slide" transparent={true} onPress={handleOkPress} title='Thank You for Registering' />}
 
-                        <AppFormField
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                        icon="lock"
-                        name="password"
-                        secureTextEntry
-                        placeholder="Password"
-                        textContentType="password"
-                        />
-                        
-
-                        <SubmitButton style={styles.button} title="Register"  />
-                    
-                    
-
-               
-
-            </AppForm>
-
-
-        </SafeAreaView>
-        
-    );
+    </SafeAreaView>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -84,6 +97,7 @@ const styles = StyleSheet.create({
         flex:1,
         padding:10,
         backgroundColor:'black'
+        
     },
 
     title:{
@@ -109,8 +123,20 @@ const styles = StyleSheet.create({
 
         paddingTop:40
 
+    },
+
+    modalstyle: {
+        justifyContent:'center',
+        alignItems:'center',
+        marginTop: 'auto',
+        marginBottom: 'auto',
+        width: 300,
+        height: 200,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        
     }
-    
-})
+});
 
 export default RegisterScreen;
