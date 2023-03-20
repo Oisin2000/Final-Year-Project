@@ -8,12 +8,26 @@ import MyMoviesScreen from '../screens/MyMoviesScreen';
 import SearchScreen from '../screens/SearchScreen';
 import WatchListScreen from '../screens/WatchListScreen';
 import AccountScreen from '../screens/AccountScreen';
+import HomeScreen from '../screens/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => (
 
     <Tab.Navigator>
+        <Tab.Screen 
+        name="Home" 
+        component={HomeScreen} 
+        options={{
+
+            tabBarIcon: ({color, size}) =>
+            <MaterialCommunityIcons name="home" color={color} size={size}/>,
+
+            headerShown: false
+            }}
+        />
+
+    
         <Tab.Screen 
         name="Search" 
         component={SearchScreen} 

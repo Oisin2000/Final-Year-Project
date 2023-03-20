@@ -35,7 +35,7 @@ function LoginScreen(props) {
         <SafeAreaView style={styles.container}>
             
             <Text style={styles.title}>The Film Club</Text>
-            <Image style={styles.logo} source={require("../assets/icon-red.png")}/>
+            <Image style={styles.logo} source={require("../assets/gold-icon.png")}/>
 
             <AppForm
                 initialValues={{email: '', password: '' }}
@@ -70,7 +70,7 @@ function LoginScreen(props) {
                         />
                         
 
-                        <AppButton title="Login" color='#bc1111' onPress={() => {login(email, password)}} />
+                        <AppButton title="Login" color='#E6AF2E' onPress={() => {login(email, password)}} />
 
                         
                     
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     container:{
         flex:1,
         padding:10,
-        backgroundColor:'black'
+        backgroundColor:'#3F0D12'
     },
 
     title:{

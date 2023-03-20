@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Screen from '../components/Screen';
 import ListItem from '../components/ListItem';
 import { SafeAreaView, View, Text, StyleSheet, Button } from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import { useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import GenreModal from '../components/GenreModal'
 
 function AccountScreen(props) {
 
     const {logout} = useContext(AuthContext);
+    const [showModal, setShowModal] = useState(false);
 
+    const handleGenre = () => {
+        setShowModal(true);
+      };
+
+      const handleClose = () => {
+        setShowModal(false);
+      };
+    
 
 
     return (
@@ -32,8 +42,11 @@ function AccountScreen(props) {
         title="My Genres"
         subtitle="Action , Thrillers"
         image={require('../assets/Genre.png')}
+        onPress={handleGenre}
+        
 
         />
+        {showModal && <GenreModal visible={showModal} animationType="slide" transparent={true} onPress={handleClose} title = "Please Select your favourite Genre..."></GenreModal>}
 
         <ListItem
         title="My Theme"

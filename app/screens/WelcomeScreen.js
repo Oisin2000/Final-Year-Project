@@ -6,27 +6,24 @@ import AppButton from '../components/AppButton';
 function WelcomeScreen({navigation}) {
     return (
 
-        <ImageBackground 
-       // blurRadius={10}
-        style={styles.background}
-        source={require('../assets/rows-red-seats-theater.jpg')}
-        >
+        <View style={styles.container}>
 
         <View style={styles.logoContainer}>
-        <Image style = {styles.logo} source={require('../assets/icon-white.png')}/>
+        <Image style = {styles.logo} source={require('../assets/gold-icon.png')}/>
         <Text style={styles.title}>The Film Club</Text>
+        <Text style={styles.text}>The Home of Film</Text>
         </View>
 
         <View style = {styles.buttonContainer}>
 
             <AppButton title="Login" onPress={() => navigation.navigate("Login")}/>
-            <AppButton title="Register" color="#d62230" onPress={() => navigation.navigate("Register")}/>
+            <AppButton title="Register" color="#E6AF2E" onPress={() => navigation.navigate("Register")}/>
 
         </View>
 
         
 
-        </ImageBackground>
+        </View>
 
 
         
@@ -34,6 +31,15 @@ function WelcomeScreen({navigation}) {
 }
 
 const styles = StyleSheet.create({
+
+    container: {
+
+        flex: 1,
+        justifyContent: "flex-end",
+        alignItems: 'center',
+        backgroundColor:'#3F0D12'
+
+    },
 
     background: {
 
@@ -43,8 +49,8 @@ const styles = StyleSheet.create({
 
     },
     logo: {
-        width: 100,
-        height: 100,
+        width: 150,
+        height: 150,
         
         
     },
@@ -61,11 +67,20 @@ const styles = StyleSheet.create({
         
     },
     title:{
-      fontSize:30,
+      fontSize:45,
       color:"white",        
       fontWeight:"600",
-      paddingVertical:15
+      paddingVertical:15,
+      
     },
+
+    text:{
+        fontSize:35,
+        color:"white",        
+        fontWeight:"500",
+        padding:10,
+        fontStyle:'italic',
+      },
 
     
 })

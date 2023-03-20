@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, StyleSheet, View, Image, Text, ScrollView, Modal, TouchableHighlight, RefreshControl } from 'react-native';
+import {
+  ImageBackground,
+  StyleSheet,
+  View,
+  Image,
+  Text,
+  ScrollView,
+  Modal,
+  TouchableHighlight,
+  RefreshControl,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-web';
 import AppButton from '../components/AppButton';
-import { useNavigation } from '@react-navigation/native';
 
-function MyMoviesScreen(props) {
+function HomeScreen(props) {
   const [state, setState] = React.useState({
     results: [],
     selected: { index: -1 },
+    refreshing: false, // added refreshing state
   });
 
   const [movies, setMovies] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false); // initialize modal state
-
-  const navigation = useNavigation();
-
-  const handleClosePress = () => {
-    setModalVisible(false);
-    navigation.navigate('My Movies');
-  };
 
   const fetchMovies = () => {
-    fetch('http://172.20.10.2:5000/mymovies')
+    fetch('http://172.20.10.2:5000/recommendedmovies')
       .then((response) => response.json())
       .then((data) => {
         console.log('All movies:', data);
@@ -36,6 +38,7 @@ function MyMoviesScreen(props) {
             genre: movie.genre,
             imdb_id: movie.imdb_id,
             imdb_rating: movie.imdb_rating,
+            imdb_votes: movie.imdb_votes,
             language: movie.language,
             metascore: movie.metascore,
             plot: movie.plot,
@@ -49,7 +52,6 @@ function MyMoviesScreen(props) {
             website: movie.website,
             writer: movie.writer,
             year: movie.year,
-            review: movie.review,
           };
         });
         setMovies(movieObjects);
@@ -76,25 +78,24 @@ function MyMoviesScreen(props) {
     fetchMovies();
   };
 
-  const selectedMovie = state.selected; // selected movie object
-  const selectedMovieIndex = selectedMovie.index; // selected movie index
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>My Movies</Text>
-      <Text style={styles.text}>Your Personal Film Library</Text>
-      <ScrollView
+    <ScrollView
         style={styles.results}
         refreshControl={
           <RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />
         }
       >
+    <View style={styles.container}>
+        <Text style={styles.title}>The Film Club</Text>
+        <Text style={styles.smalltext}>Welcome to the Film Club, the go-to app for all movie lovers out there. Get ready to embark on a cinematic journey with a vibrant community of like-minded individuals who share your passion for films. </Text>
+        <Text style={styles.smalltext}>Below are some of our favourite movies, use the search screen to discover new movies and add them to your watch list so hours of searching for a good movie to watch is a thing of the past. Keep track of all the movies you've watched and loved with our easy-to-use My Movies feature. Rate and review your favorites, and never forget a great film again </Text>
+      <Text style={styles.text}>Recommended Movies: </Text>
+      
         {movies.map((movie, index) => (
           <TouchableHighlight
             onPress={() => {
               setState({ selected: { ...movie, index } });
               console.log('Selected movie:', movie);
-              setModalVisible(true); // set modal state to true when a movie is selected
             }}
             key={movie.id}
           >
@@ -105,73 +106,35 @@ function MyMoviesScreen(props) {
                   width: '100%',
                   height: 300,
                 }}
-                resizeMode='stretch'
+                resizeMode="contain"
               />
-              <Text style={styles.heading}>{movie.title}</Text>
+              
             </View>
           </TouchableHighlight>
         ))}
-      </ScrollView>
-
-      {/* Modal component */}
-      <Modal visible={modalVisible} animationType="slide">
-      <ScrollView
-        style={styles.results}
-        >
-        
       
-          <Image
-            source={{ uri: selectedMovie.poster }}
-            style={{
-              width: '100%',
-              height: 600,
-            }}
-            resizeMode="stretch"
-          />
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{selectedMovie.title}</Text>
-            <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
-            <Text style={styles.modaltext}>Director: {selectedMovie.director}</Text>
-            <Text style={styles.modaltext}>Genre: {selectedMovie.genre}</Text>
-            <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
-            <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
-            <Text style={styles.modaltext}>Box Office: {selectedMovie.box_office}</Text>
-            <Text style={styles.modaltext}>Run Time: {selectedMovie.runtime}</Text>
-            <Text style={styles.modaltext}>Released: {selectedMovie.released}</Text>
-            <Text style={styles.modaltext}>Rated: {selectedMovie.rated}</Text>
-            <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
-            <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
-            <Text style={styles.modaltext} >My Review: {state.selected.review}</Text>
-          </View>
-          <View style={styles.buttonContainer}>
-            <AppButton
-              title="Close"
-              onPress={handleClosePress}
-              color='#E6AF2E'
-            />
-          </View>
-          </ScrollView>
-        </Modal>
     </View>
+    </ScrollView>
   );
 }
+
   
 
 const styles = StyleSheet.create({
 
     container: {
 
-        flex:1,
+        flex:10,
         backgroundColor: '#3F0D12',
         alignItems:'stretch',
         justifyContent: 'flex-end',
-        paddingTop: 70,
+        paddingTop: 100,
         paddingHorizontal: 20,
     },
 
     buttonContainer:{
 
-        backgroundColor: '#3F0D12',
+        backgroundColor: '#750a18',
         padding:20,
        
         width:"100%",
@@ -179,7 +142,7 @@ const styles = StyleSheet.create({
     },
 
     closeButton: {
-      backgroundColor: '#E6AF2E',
+      backgroundColor: '#cc0000',
       padding: 10,
       borderRadius: 5,
       marginTop: 20,
@@ -187,54 +150,48 @@ const styles = StyleSheet.create({
 
     modalContent: {
       flex: 1,
-      alignItems: 'flex-start',
+      alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#3F0D12',
-      
+      backgroundColor: '#750a18',
+      padding:20
     },
 
     modalTitle: {
       fontSize: 24,
       fontWeight: 'bold',
       marginBottom: 20,
-      marginTop: 20,
-      color: '#FFF',
-      fontSize: 30,
-      alignSelf:'center'
     },
 
 
     title: {
         color: '#FFF',
         fontSize: 40,
+        fontFamily:'Avenir',
         fontWeight: '700',
         textAlign: 'center',
         alignSelf:'center',
         marginBottom: 10,
-        fontStyle:'italic'
-
     },
 
     text: {
-      color: '#FFF',
-      fontSize: 30,
-      fontWeight: '500',
-      textAlign: 'center',
-      alignSelf:'center',
-      marginBottom: 20
+        color: '#FFF',
+        fontSize: 25,
+        fontWeight: '500',
+        textAlign: 'left',
+        alignSelf:'center',
+        marginBottom: 20
 
-  },
+    },
 
-  modaltext: {
-    color: '#FFF',
-    fontSize: 20,
-    fontWeight: '300',
-    textAlign: 'left',
-    alignSelf:'center',
-    marginBottom: 20,
-    padding:15
+    smalltext: {
+        color: '#FFF',
+        fontSize: 15,
+        fontWeight: '300',
+        textAlign: 'left',
+        alignSelf:'center',
+        marginBottom: 20
 
-},
+    },
 
     searchbox: {
 
@@ -250,7 +207,7 @@ const styles = StyleSheet.create({
 
     results: {
 
-        color: '#FFF',
+        color: '#bc1111',
         fontSize: 22,
         fontWeight: '500',
         textAlign: 'left',
@@ -263,20 +220,19 @@ const styles = StyleSheet.create({
 
         flex:1,
         width:"100%",
-        
-        padding:20
+        marginBottom: 20
         
 
     },
 
     heading: {
 
-      color:"#FFF",
-      fontSize:22,
-      fontWeight: "400",
-      padding:15,
-      textAlign:'center',
-      backgroundColor:"#A71D31",
+        color:"#FFF",
+        fontSize:18,
+        fontWeight: "700",
+        padding:20,
+        textAlign:'center',
+        backgroundColor:"#000000"
 
     },
 
@@ -315,4 +271,4 @@ const styles = StyleSheet.create({
     
 })
 
-export default MyMoviesScreen;
+export default HomeScreen;
