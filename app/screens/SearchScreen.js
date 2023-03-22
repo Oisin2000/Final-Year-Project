@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TouchableHighlight, TextInput, ScrollView, Image, Modal, SafeAreaView , Alert} from 'react-native';
 import { TouchableOpacity } from "react-native";
 import axios from 'axios';
@@ -8,8 +8,67 @@ import AddingScreen from '../screens/AddingScreen';
 import AppModal from '../components/AppModal';
 import AppNavigator from '../navigation/AppNavigator';
 import { useNavigation } from '@react-navigation/native';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 function SearchScreen(props) {
+
+  const TMDB_API_KEY = '9d238a902ba51bf41bc13aded64d7960';
+    const TRENDING_MOVIES_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_API_KEY}`;
+
+  const [isRecommendedModalVisible, setIsRecommendedModalVisible] = useState(false);
+
+  const toggleRecommendedModal = () => {
+    setIsRecommendedModalVisible(!isRecommendedModalVisible);
+  };
+
+  const [selectedGenre, setSelectedGenre] = useState(null);
+    const [genremovies, setGenreMovies] = useState([]);
+  
+    const fetchMoviesByGenre = (genreId) => {
+      const MOVIES_BY_GENRE_URL = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_genres=${genreId}&vote_count.lte=7&language=en-US`;
+      fetch(MOVIES_BY_GENRE_URL)
+        .then((response) => response.json())
+        .then((data) => {
+          setGenreMovies(data.results);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    };
+  
+    useEffect(() => {
+      if (selectedGenre) {
+        fetchMoviesByGenre(selectedGenre);
+      }
+    }, [selectedGenre]);
+  
+    const renderGenreMovie = ({ item }) => (
+      <View style={styles.movieContainer}>
+        <Image
+          style={styles.moviePoster}
+          source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
+        />
+        <View style={styles.movieDetails}>
+          <Text style={styles.movieTitle}>{item.title}</Text>
+          <Text style={styles.movieGenre}>{item.genre}</Text>
+        </View>
+      </View>
+    );
+  
+    const handleGenreSelect = (genreId) => {
+      setSelectedGenre(genreId);
+    };
+
+  
+
+    const genres = [
+        { label: 'Select a genre', value: null },
+        { label: 'Action', value: '28' },
+        { label: 'Comedy', value: '35' },
+        { label: 'Drama', value: '18' },
+        { label: 'Science Fiction', value: '878' },
+        { label: 'Thriller', value: '53' },
+      ];
 
     const [showAddingScreen, setShowAddingScreen] = useState(false);
 
@@ -183,6 +242,18 @@ function SearchScreen(props) {
             value = {state.s}
 
             />
+
+          <DropDownPicker
+                visible={isRecommendedModalVisible}
+                items={genres}
+                defaultValue={selectedGenre}
+                placeholder="Select a genre"
+                containerStyle={{ height: 40 }}
+                style={styles.dropdown}
+                itemStyle={{ justifyContent: 'flex-start' }}
+                dropDownStyle={{ backgroundColor: '#fafafa', marginTop: 10 , zIndex:9999}}
+                onChangeItem={(item) => handleGenreSelect(item.value)}
+              />
             
             {showModal && <AppModal visible={showModal} animationType="slide" transparent={true} onPress={handleModalOk} title='No Results Found' />}
 
@@ -309,7 +380,7 @@ const styles = StyleSheet.create({
         fontWeight:'20',
         padding:20,
         width:"100%",
-        backgroundColor:"#fff",
+        backgroundColor:"#FFF",
         borderRadius:8,
         marginBottom:40,
 

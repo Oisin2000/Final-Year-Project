@@ -36,10 +36,10 @@ const styles = StyleSheet.create({
 
         width:70,
         height:70,
-        borderRadius:35,
         marginRight: 10,
         marginLeft:10,
-        marginTop:20
+        marginTop:20,
+        
 
     },
 

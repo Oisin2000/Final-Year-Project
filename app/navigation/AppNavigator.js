@@ -9,6 +9,9 @@ import SearchScreen from '../screens/SearchScreen';
 import WatchListScreen from '../screens/WatchListScreen';
 import AccountScreen from '../screens/AccountScreen';
 import HomeScreen from '../screens/HomeScreen';
+import HomeScreen2 from '../screens/HomeScreen2';
+import { StackActions } from '@react-navigation/native';
+import TrendingNavigator from './TrendingNav';
 
 const Tab = createBottomTabNavigator();
 
@@ -17,7 +20,7 @@ const AppNavigator = () => (
     <Tab.Navigator>
         <Tab.Screen 
         name="Home" 
-        component={HomeScreen} 
+        component={HomeScreen2} 
         options={{
 
             tabBarIcon: ({color, size}) =>
@@ -76,8 +79,15 @@ const AppNavigator = () => (
             }}
         />
 
+        <Tab.Screen 
+            name="TrendingNavigator"
+            component={TrendingNavigator}
+            options={{ tabBarButton: () => null }}
+        />
+
     </Tab.Navigator>
 
+    
 
 
 
