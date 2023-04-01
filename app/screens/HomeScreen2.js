@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   ImageBackground,
   StyleSheet,
   View,
-  Image,
   Text,
   TextInput,
   ScrollView,
   Modal,
-  TouchableHighlight,
-  RefreshControl,
-  FlatList
+  Image,
+  TouchableOpacity,
+  FlatList,
+  Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-web';
+
+
 import AppButton from '../components/AppButton';
-import { TouchableOpacity } from 'react-native';
-import {FontAwesome5, MaterialCommunityIcons} from '@expo/vector-icons';
+
 import HomeScreenTile from '../components/HomeScreenTile';
-import ListItem from '../components/ListItem';
-import axios from 'axios';
+
 import { Dropdown } from 'react-native-element-dropdown';
 import ListItemFriends from '../components/ListItemFriends';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import colours from '../config/colours';
+import HomeScreenTile2 from '../components/HomeScreenTile2';
+
 
 function HomeScreen2(props) {
 
@@ -86,14 +86,27 @@ function HomeScreen2(props) {
 
   const renderMovie = ({ item }) => (
     
+    <TouchableOpacity onPress={() => {
+      Alert.alert(
+        `Please use our search feature to find more information on this weeks trending movies !`,
+        'Please use our search feature to find more information on this weeks trending movies !'
+        [
+          {
+            text: 'OK',
+            onPress: () => console.log('OK Pressed')
+          }
+        ],
+        { cancelable: true }
+      );
+    }}>
       <View style={styles.movieContainer}>
         <Image
-          style={styles.moviePoster}
+          style={styles.listposter}
           source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
         />
         <Text style={styles.movieTitle}>{item.title}</Text>
       </View>
-    
+    </TouchableOpacity>
   );
   
 
@@ -149,9 +162,22 @@ function HomeScreen2(props) {
   
     const renderGenreMovie = ({ item }) => (
         <View style={styles.row}>
+          <TouchableOpacity onPress={() => {
+      Alert.alert(
+        `Please use our search feature to find more information on this weeks trending movies !`,
+        'Please use our search feature to find more information on this weeks trending movies !'
+        [
+          {
+            text: 'OK',
+            onPress: () => console.log('OK Pressed')
+          }
+        ],
+        { cancelable: true }
+      );
+    }}>
       <View style={styles.movieContainer}>
         <Image
-          style={styles.moviePoster}
+          style={styles.listposter}
           source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
         />
         <View style={styles.movieDetails}>
@@ -159,6 +185,7 @@ function HomeScreen2(props) {
           <Text style={styles.movieGenre}>{item.genre}</Text>
         </View>
       </View>
+      </TouchableOpacity>
       </View>
     );
   
@@ -181,49 +208,51 @@ function HomeScreen2(props) {
       
     
   return (
+    <ScrollView style={styles.container}>
     
-    <View style={styles.container}>
         <Text style={styles.title}>The Film Club</Text>
-      <Text style={styles.smalltext}>Welcome to the Film Club, the go-to app for all movie lovers out there!</Text>
+      
     <View style={styles.topContainer}>
 
-        <ImageBackground source={require('../assets/rows-red-seats-theater.jpg')} style={styles.bigcontainer} imageStyle={{borderRadius:20}}>
-            <Text style={styles.tileTitle}>Hello User!</Text>
-            <Text style={styles.tileText}>Search below for the all the best Movies !</Text>
+        <View  style={styles.bigcontainer} >
+            <Text style={styles.tileTitle}>Hello Oisin!</Text>
+            <Text style={styles.tileText}>Welcome to the Film Club, the go-to app for all movie lovers out there!</Text>
 
-            <TextInput 
-
-            placeholder='Enter a movie ...'
-            style = {styles.searchbox}
-           
-            />
-        </ImageBackground>
+            
+        </View>
       
       <View style={styles.rowContainer}>
-        <HomeScreenTile title={"About Us"} icon={'info'} color="#A71D31" onPress={toggleInfoModal}/>
+        <HomeScreenTile2 title={"About Us"} icon={'info'} color={colours.third} onPress={toggleInfoModal}/>
 
-        <HomeScreenTile title={"Friends"} icon={'user-friends'} color="#A71D31" onPress={toggleFriendModal}/>
+        <HomeScreenTile title={"Friends"} icon={'user-friends'} color={colours.third} onPress={toggleFriendModal}/>
       </View>
     </View>
     <View style={styles.bottomContainer}>
       <View style={styles.rowContainer}>
-      <HomeScreenTile title={"Top 10 Movies"} icon={'trophy'} color="#A71D31" onPress={toggleTopModal}/>
+      <HomeScreenTile2 title={"Trending"} icon={'trending-up'} color={colours.third} onPress={toggleTopModal}/>
 
-      <HomeScreenTile title={"Recommended"} icon={'film'} color="#A71D31" onPress={toggleRecommendedModal}/>
+      <HomeScreenTile title={"By Genre"} icon={'film'} color={colours.third} onPress={toggleRecommendedModal}/>
       </View>
     </View>
     <Modal visible={isInfoModalVisible} animationType="slide">
         <View style={styles.modalBackground}>
-        <ImageBackground blurRadius={10} source={require('../assets/rows-red-seats-theater.jpg')} style={styles.modalImage}>
-          <Text style={styles.modalTitle}>
+        <Text style={styles.modalTitle}>
           About us</Text>
-          <Text style={styles.modalText}>This app is all about movies!</Text>
+        <ScrollView>
+          
+          <Text style={styles.aboutText}>Welcome to the Film Club, the ultimate destination for movie lovers! Our app is designed to provide you with the latest information about the trending movies of the week, and to help you discover new movies based on your favorite genres.  Whether you're a die-hard fan of action movies or you prefer to be transported to a different world with fantasy movies, our app has something for everyone.</Text>
+
+          <Text style={styles.aboutText}>At the Film Club, we understand that watching movies is not just a form of entertainment, it's an experience. That's why we've created a platform that allows you to curate your own movie collection, and share your thoughts and opinions with others. With our search feature, you can easily find any movie you want and add it to your watchlist or your own personal list of favorite movies.</Text>
+
+          <Text style={styles.aboutText}>We believe that the best part of watching a movie is being able to discuss it with others. That's why we've included a review feature, so you can share your thoughts on a movie with the rest of the Film Club community. Whether you loved a movie or you didn't enjoy it as much, we want to hear from you.</Text>
+
+          <Text style={styles.aboutText}>The Film Club is more than just an app - it's a community of movie lovers who are passionate about the art of cinema. So join us today, and let's explore the world of movies together!</Text>
           <AppButton
               title="Close"
               onPress={toggleInfoModal}
-              color='#E6AF2E'
+              color={colours.secondary}
             />
-        </ImageBackground>
+        </ScrollView>
         </View>
       </Modal>
 
@@ -232,8 +261,9 @@ function HomeScreen2(props) {
   <View style={styles.modalBackground}>
     <View style={styles.modalImage}>
       <Text style={styles.modalTitle}>My Friends</Text>
+      <ScrollView style={{backgroundColor:colours.primary}}>
       <Text style={styles.modalText}>See your friends favourite genres and top movie!</Text>
-      <ScrollView style={{backgroundColor:'#3F0D12'}}>
+      
       {friends.map((friend) => (
         <ListItemFriends
           key={friend.Name}
@@ -252,7 +282,7 @@ function HomeScreen2(props) {
       <AppButton
         title="Close"
         onPress={toggleFriendModal}
-        color='#E6AF2E'
+        color={colours.secondary}
       />
       </View>
 </Modal>
@@ -268,7 +298,7 @@ function HomeScreen2(props) {
         </View>
 
         <View style={styles.buttonContainer}>
-          <AppButton title="Close" onPress={toggleTopModal} color="#E6AF2E" />
+          <AppButton title="Close" onPress={toggleTopModal} color={colours.secondary} />
         </View>
       </Modal>
 
@@ -302,13 +332,14 @@ function HomeScreen2(props) {
       />
 </View>
 <View style={styles.buttonContainer}>
-          <AppButton title="Close" onPress={toggleRecommendedModal} color="#E6AF2E" />
+          <AppButton title="Close" onPress={toggleRecommendedModal} color={colours.secondary} />
         </View>
     </Modal>
     
 
       
-  </View>
+  
+  </ScrollView>
 );
 }
 
@@ -318,11 +349,21 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
-        backgroundColor: '#3F0D12',
+        backgroundColor: colours.primary,
+        borderWidth:2,
+        borderColor:colours.third
       },
+      listposter: {
+
+        width:'100%',
+        height:350,
+        borderWidth:10,
+        
+        borderColor:colours.third
+    },
       buttonContainer:{
 
-        backgroundColor: '#3F0D12',
+        backgroundColor: colours.primary,
         padding:20,
         width:"100%",
         justifyContent:'flex-end',
@@ -344,19 +385,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop:30,
+        marginTop:10,
         padding:5
       },
       title: {
         fontSize: 40,
-        fontWeight: 'bold',
-        color: '#fff',
+      fontFamily:'Avenir',
+        fontWeight: '600',
+        color: colours.white,
         marginTop:75,
         alignSelf:'center'
       },
       smalltext: {
         fontSize: 20,
-        color: '#fff',
+        color: colours.white,
         textAlign: 'center',
         marginHorizontal: 20,
         marginTop: 20,
@@ -364,13 +406,13 @@ const styles = StyleSheet.create({
 
       buttontext: {
         fontSize: 16,
-        color: '#fff',
+        color: colours.white,
         textAlign: 'center',
         
       },
 
       smallcontainer: {
-        backgroundColor: '#A71D31',
+        backgroundColor: colours.third,
         alignItems: 'center',
         justifyContent: 'center',
         height: 70,
@@ -381,7 +423,7 @@ const styles = StyleSheet.create({
       },
 
       bigcontainer: {
-        backgroundColor: '#A71D31',
+        backgroundColor: colours.third,
         alignItems: 'center',
         justifyContent: 'center',
         height: 220,
@@ -391,11 +433,11 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         marginBottom: 20,
         borderWidth:2,
-        borderColor:'#FFF'
+        borderColor:colours.secondary
       },
       modalContainer: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: colours.white,
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
@@ -404,13 +446,24 @@ const styles = StyleSheet.create({
         fontSize: 36,
         fontWeight: 'bold',
         marginTop: 70,
-        color:"#FFF"
+        padding:15,
+        textAlign:'center',
+        color:colours.white
       },
       modalText: {
         fontSize: 22,
-        marginBottom: 30,
-        marginTop:80,
-        color:"#FFF",
+        marginBottom: 10,
+        marginTop:60,
+        color:colours.white,
+        padding:15,
+        textAlign:'center'
+      },
+
+      aboutText: {
+        fontSize: 18,
+        marginBottom: 10,
+        marginTop:20,
+        color:colours.white,
         padding:15,
         textAlign:'center'
       },
@@ -419,13 +472,13 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: '500',
         marginBottom: 10,
-        color:"#FFF"
+        color:colours.white
       },
 
       tileText: {
         fontSize: 18,
         marginBottom: 10,
-        color:"#FFF",
+        color:colours.white,
         padding:15
       },
 
@@ -433,8 +486,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#3F0D12',
-        zIndex:1
+        backgroundColor: colours.primary,
+        
        
         
       },
@@ -461,7 +514,7 @@ const styles = StyleSheet.create({
         fontWeight:'20',
         padding:10,
         width:"80%",
-        backgroundColor:"#fff",
+        backgroundColor:colours.white,
         borderRadius:36,
         marginBottom:1,
 
@@ -473,11 +526,11 @@ const styles = StyleSheet.create({
         fontWeight:'20',
         padding:10,
         width:"80%",
-        backgroundColor:"#fff",
+        backgroundColor:colours.white,
         borderRadius:10,
         
-        marginTop:10,
-        marginBottom:20,
+       
+        marginBottom:10,
         alignSelf:'center',
         zIndex:9999
 
@@ -487,7 +540,7 @@ const styles = StyleSheet.create({
         margin: 10,
         borderRadius: 10,
         overflow: 'hidden',
-        backgroundColor: '#ffffff',
+        backgroundColor: colours.white,
         elevation: 5,
         width:250,
         
@@ -505,7 +558,7 @@ const styles = StyleSheet.create({
       },
       trending: {
         flex: 1,
-        backgroundColor: "#3F0D12"
+        backgroundColor: colours.primary
       },
 
       backdropImage: {
@@ -518,7 +571,7 @@ const styles = StyleSheet.create({
       
       movieOverview: {
         fontSize: 16,
-        color: '#FFFFFF',
+        color: colours.white,
       },
 
       
@@ -527,7 +580,7 @@ const styles = StyleSheet.create({
       },
       label: {
         position: 'absolute',
-        backgroundColor: 'white',
+        backgroundColor: colours.white,
         left: 22,
         top: 8,
         zIndex: 999,

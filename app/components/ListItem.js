@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Image, TouchableHighlight, Text, SafeAreaView } from 'react-native';
 import  Swipeable  from 'react-native-gesture-handler/Swipeable';
+import colours from '../config/colours';
 
 function ListItem({title, subtitle, image, ImageComponent, onPress, renderRightActions}) {
 
@@ -16,7 +17,7 @@ function ListItem({title, subtitle, image, ImageComponent, onPress, renderRightA
             {image && <Image style={styles.image} source={image}/>}
             <SafeAreaView style={styles.details}>
                 <Text style={styles.title}>{title}</Text>
-                <Text>{subtitle}</Text>
+                <Text style={styles.subTitle}>{subtitle}</Text>
             </SafeAreaView>
 
         </SafeAreaView>
@@ -45,11 +46,15 @@ const styles = StyleSheet.create({
 
     title:{
         fontWeight:'500',
-        marginTop:25
+        marginTop:25,
+        color: colours.white,
+        fontSize: 24,
+        padding:20
     },
 
     subTitle:{
-        color:'#6e6969',
+        color: colours.white,
+        marginBottom:30
     },
 
     details: {

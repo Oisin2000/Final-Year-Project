@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import { SafeAreaView, StyleSheet, Text, Image, Modal, View, Button } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, Modal, View, Button, Image } from 'react-native';
 import * as Yup from 'yup';
 import AppFormField from '../components/AppFormField';
 import SubmitButton from '../components/SubmitButton';
@@ -9,6 +9,8 @@ import { AuthContext } from '../../context/AuthContext';
 import AppButton from '../components/AppButton';
 import { useNavigation } from '@react-navigation/native';
 import AppModal from '../components/AppModal';
+import FastImage from 'react-native-fast-image';
+import colours from '../config/colours';
 
 const validationSchema = Yup.object().shape({
 
@@ -45,7 +47,8 @@ const navigation = useNavigation(); // Get navigation object
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>The Film Club</Text>
-      <Image style={styles.logo} source={require("../assets/icon-red.png")} />
+      <Text style={styles.subtitle}>Enter details to register with us !</Text>
+      
 
       <AppForm
         initialValues={{ name: '', email: '', password: '' }}
@@ -82,7 +85,7 @@ const navigation = useNavigation(); // Get navigation object
           value={password}
           onChangeText={text => setPassword(text)}
         />
-        <AppButton style={styles.button} title="Register" color='#bc1111' onPress= {handleRegister}/>
+        <AppButton style={styles.button} title="Register" color={colours.third} onPress= {handleRegister}/>
       </AppForm>
 
       {showModal && <AppModal visible={showModal} animationType="slide" transparent={true} onPress={handleOkPress} title='Thank You for Registering' />}
@@ -96,20 +99,34 @@ const styles = StyleSheet.create({
     container:{
         flex:1,
         padding:10,
-        backgroundColor:'black'
+        backgroundColor: colours.primary
         
     },
 
     title:{
 
-        alignSelf:'center',
-        marginTop:100,
-        fontSize:35,
-        fontWeight:'550',
-        color:"white",
-        
+      alignSelf:'center',
+      marginTop:100,
+      marginBottom:10,
+      fontSize:45,
+      fontWeight:'550',
+      fontStyle:'italic',
+      color:colours.secondary,
+      
 
-    },
+  },
+
+  subtitle:{
+
+      alignSelf:'center',
+      
+      fontSize:25,
+      fontWeight:'550',
+      marginBottom:100,
+      color:"white",
+      
+
+  },
 
     logo: {
         width:110,
@@ -132,7 +149,7 @@ const styles = StyleSheet.create({
         marginBottom: 'auto',
         width: 300,
         height: 200,
-        backgroundColor: 'white',
+        backgroundColor: colours.white,
         borderRadius: 10,
         padding: 20,
         

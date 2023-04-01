@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, StyleSheet, View, Image, Text, ScrollView, Modal, TouchableHighlight, RefreshControl, Alert } from 'react-native';
+import { ImageBackground, StyleSheet, View, Image, Text, ScrollView, Modal, TouchableHighlight, RefreshControl, Alert, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-web';
 import AppButton from '../components/AppButton';
 import { useNavigation } from '@react-navigation/native';
+import colours from '../config/colours';
+import AddingScreen from '../screens/AddingScreen';
+
 
 function WatchListScreen(props) {
   const [state, setState] = React.useState({
@@ -14,6 +17,7 @@ function WatchListScreen(props) {
   const [modalVisible, setModalVisible] = useState(false); // initialize modal state
 
   const navigation = useNavigation();
+  const [isAdding, setIsAdding] = useState(false);
 
   const handleClosePress = () => {
     setModalVisible(false);
@@ -97,59 +101,73 @@ function WatchListScreen(props) {
   };
 
   const handleAddMovie = () => {
-    // Prompt the user to enter a review
+    // Prompt the user to enter a review and rating
+    let reviewText = '';
+    let myratingText = '';
     Alert.prompt(
       selectedMovie.title,
-      'Leave a review',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Ok',
-          onPress: review => {
-            const data = { ...selectedMovieData, review: review || 'No Review' };
-            
-            // Make a request to remove the selected movie from the watchlist
-            fetch('http://172.20.10.2:5000/remove-watchlist', {
-              method: 'POST',
-              body: JSON.stringify(selectedMovieData),
-              headers: {
-                'Content-Type': 'application/json'
+      "Please leave a review",
+      review => {
+        if (review !== null) {
+          reviewText = review;
+          Alert.prompt(
+            selectedMovie.title,
+            "Please enter a rating out of 10",
+            myrating => {
+              if (myrating !== null) {
+                myratingText = myrating;
+                const data = { ...selectedMovieData, review: review || 'No Review', myrating: myrating || 'No Rating' };
+  
+                // Make a request to remove the selected movie from the watchlist
+                fetch('http://172.20.10.2:5000/remove-watchlist', {
+                  method: 'POST',
+                  body: JSON.stringify(selectedMovieData),
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                })
+                .then(response => {
+                  console.log(response.status); // log the response status code
+                  if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                  }
+  
+                  // Make a request to add the movie to mymovies
+                  fetch('http://172.20.10.2:5000/add-mymovies-from-watchlist', {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  })
+                  .then(response => {
+                    console.log(response.status); // log the response status code
+                    if (!response.ok) {
+                      throw new Error('Network response was not ok');
+                    }
+                    setIsAdding(true); // set isAdding to true here
+                    return response.json();
+                  })
+                  .then(data => {
+                    console.log('Data received:', data.message);
+                  })
+                  .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                  }).finally(() => {
+                    setTimeout(() => {
+                      setIsAdding(false);
+                      onRefresh();
+                    }, 2000);  // set a 2 second delay before setting setIsAdding to false
+                  });
+                });
               }
-            })
-            .then(response => {
-              console.log(response.status); // log the response status code
-              if (!response.ok) {
-                throw new Error('Network response was not ok');
-              }
-    
-              // Make a request to add the movie to mymovies
-              fetch('http://172.20.10.2:5000/add-mymovies-from-watchlist', {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              })
-              .then(response => {
-                console.log(response.status); // log the response status code
-                if (!response.ok) {
-                  throw new Error('Network response was not ok');
-                }
-                return response.json();
-              })
-              .then(data => {
-                console.log('Data received:', data.message);
-              })
-              .catch(error => {
-                console.error('There was a problem with the fetch operation:', error);
-              });
-            });
-          },
-        },
-      ],
+            },
+            'plain-text',
+            null,
+            'numeric',
+          );
+        }
+      }
     );
   };
 
@@ -171,38 +189,38 @@ function WatchListScreen(props) {
     <View style={styles.container}>
       <Text style={styles.title}>My WatchList</Text>
       <Text style={styles.text}>Never forget a movie again</Text>
-      <ScrollView
-        style={styles.results}
-        refreshControl={
-          <RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {movies.map((movie, index) => (
-          <TouchableHighlight
-            onPress={() => {
-              setState({ selected: { ...movie, index } });
-              console.log('Selected movie:', movie);
-              setModalVisible(true); // set modal state to true when a movie is selected
-            }}
-            key={movie.id}
-          >
-            <View style={styles.result}>
-              <Image
-                source={{ uri: movie.poster }}
-                style={{
-                  width: '100%',
-                  height: 300,
+      <FlatList
+          style={styles.results}
+          data={movies}
+          keyExtractor={(movie) => movie.title}
+          renderItem={({ item: movie, index }) => {
+            return (
+              <TouchableHighlight
+                onPress={() => {
+                  setState({ selected: { ...movie, index } });
+                  console.log('Selected movie:', movie);
+                  setModalVisible(true); // set modal state to true when a movie is selected
                 }}
-                resizeMode='stretch'
-              />
-              <Text style={styles.heading}>{movie.title}</Text>
-            </View>
-          </TouchableHighlight>
-        ))}
-      </ScrollView>
+                key={movie.title}
+              >
+                <View style={styles.result}>
+                  <Image
+                    source={{ uri: movie.poster }}
+                    style={styles.listposter}
+                    resizeMode='stretch'
+                  />
+                  <Text style={styles.heading}>{movie.title}</Text>
+                </View>
+              </TouchableHighlight>
+            );
+          }}
+          refreshControl={
+            <RefreshControl refreshing={state.refreshing} onRefresh={onRefresh} />
+          }
+        />
 
       {/* Modal component */}
-      <Modal visible={modalVisible} animationType="slide">
+      <Modal visible={modalVisible} animationType="slide" >
       <ScrollView
         style={styles.results}
         >
@@ -210,10 +228,7 @@ function WatchListScreen(props) {
       
           <Image
             source={{ uri: selectedMovie.poster }}
-            style={{
-              width: '100%',
-              height: 600,
-            }}
+            style={styles.poster}
             resizeMode="stretch"
           />
           <View style={styles.modalContent}>
@@ -234,15 +249,18 @@ function WatchListScreen(props) {
             <AppButton
               title="Add to my Movies"
               onPress={handleAddMovie}
-              color='#FFF'
+              color={colours.secondary}
             />
             <AppButton
               title="Close"
               onPress={handleClosePress}
-              color='#E6AF2E'
+              color={colours.third}
             />
           </View>
           </ScrollView>
+          <Modal visible={isAdding} animationType={'fade'}>
+                <AddingScreen setIsAdding={setIsAdding} />
+                </Modal>
         </Modal>
     </View>
   );
@@ -254,16 +272,35 @@ const styles = StyleSheet.create({
     container: {
 
         flex:1,
-        backgroundColor: '#3F0D12',
+        backgroundColor: colours.primary,
+        borderWidth:2,
+        borderColor:colours.secondary,
         alignItems:'stretch',
         justifyContent: 'flex-end',
         paddingTop: 70,
         paddingHorizontal: 20,
     },
 
+    poster: {
+
+      width:'100%',
+      height:600,
+      borderWidth:10,
+      borderRadius:20,
+      borderColor:colours.third
+  },
+  listposter: {
+
+    width:'100%',
+    height:400,
+    borderWidth:10,
+    
+    borderColor:colours.secondary
+},
+
     buttonContainer:{
 
-        backgroundColor: '#3F0D12',
+        backgroundColor: colours.primary,
         padding:20,
        
         width:"100%",
@@ -271,7 +308,7 @@ const styles = StyleSheet.create({
     },
 
     closeButton: {
-      backgroundColor: '#E6AF2E',
+      backgroundColor: colours.third,
       padding: 10,
       borderRadius: 5,
       marginTop: 20,
@@ -281,7 +318,8 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'flex-start',
       justifyContent: 'center',
-      backgroundColor: '#3F0D12',
+      backgroundColor: colours.primary,
+      padding:20
       
     },
 
@@ -290,7 +328,8 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginBottom: 20,
       marginTop: 20,
-      color: '#FFF',
+      padding:10,
+      color: colours.white,
       fontSize: 30,
       alignSelf:'center',
       fontFamily:'Avenir',
@@ -298,10 +337,10 @@ const styles = StyleSheet.create({
 
 
     title: {
-        color: '#FFF',
+        color: colours.white,
         fontSize: 40,
         fontFamily:'Avenir',
-        fontWeight: '700',
+        fontWeight: '600',
         textAlign: 'center',
         alignSelf:'center',
         marginBottom: 10,
@@ -310,9 +349,9 @@ const styles = StyleSheet.create({
     },
 
     text: {
-      color: '#FFF',
-      fontSize: 30,
-      fontWeight: '500',
+      color: colours.white,
+      fontSize: 24,
+      fontWeight: '400',
       textAlign: 'center',
       alignSelf:'center',
       marginBottom: 20
@@ -320,7 +359,7 @@ const styles = StyleSheet.create({
   },
 
   modaltext: {
-    color: '#FFF',
+    color: colours.white,
     fontSize: 20,
     fontWeight: '300',
     textAlign: 'left',
@@ -336,7 +375,7 @@ const styles = StyleSheet.create({
         fontWeight:'20',
         padding:20,
         width:"100%",
-        backgroundColor:"#fff",
+        backgroundColor:colours.white,
         borderRadius:8,
         marginBottom:40,
 
@@ -344,10 +383,11 @@ const styles = StyleSheet.create({
 
     results: {
 
-        color: '#FFF',
+        color: colours.white,
         fontSize: 22,
         fontWeight: '500',
         textAlign: 'left',
+        backgroundColor:colours.primary
         
         
 
@@ -365,12 +405,12 @@ const styles = StyleSheet.create({
 
     heading: {
 
-        color:"#FFF",
+        color:colours.white,
         fontSize:22,
         fontWeight: "400",
         padding:15,
         textAlign:'center',
-        backgroundColor:"#A71D31",
+        backgroundColor:colours.third,
         
 
     },
@@ -386,25 +426,6 @@ const styles = StyleSheet.create({
 
     },
 
-    popup: {
-
-        flex:1,
-        padding:20,
-        justifyContent: "flex-start",
-        backgroundColor: '#750a18',
-        
-
-    },
-
-    poptitle: {
-
-        fontSize:25,
-        fontWeight:"700",
-        marginTop:10,
-        marginBottom: 10,
-        alignSelf: 'center',
-
-    },
 
 
     

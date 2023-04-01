@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ImageBackground, StyleSheet, View, Image, Text, ScrollView, Modal, TouchableHighlight, RefreshControl } from 'react-native';
+import { ImageBackground, StyleSheet, View, Image, Text, ScrollView, Modal, TouchableHighlight, RefreshControl, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-web';
 import AppButton from '../components/AppButton';
 import { useNavigation } from '@react-navigation/native';
+import colours from '../config/colours';
 
 function MyMoviesScreen(props) {
   const [state, setState] = React.useState({
@@ -50,6 +51,7 @@ function MyMoviesScreen(props) {
             writer: movie.writer,
             year: movie.year,
             review: movie.review,
+            myrating: movie.myrating
           };
         });
         setMovies(movieObjects);
@@ -91,25 +93,38 @@ function MyMoviesScreen(props) {
       >
         {movies.map((movie, index) => (
           <TouchableHighlight
-            onPress={() => {
-              setState({ selected: { ...movie, index } });
-              console.log('Selected movie:', movie);
-              setModalVisible(true); // set modal state to true when a movie is selected
-            }}
-            key={movie.id}
-          >
-            <View style={styles.result}>
-              <Image
-                source={{ uri: movie.poster }}
-                style={{
-                  width: '100%',
-                  height: 300,
-                }}
-                resizeMode='stretch'
-              />
-              <Text style={styles.heading}>{movie.title}</Text>
-            </View>
-          </TouchableHighlight>
+          onPress={() => {
+            setState({ selected: { ...movie, index } });
+            console.log('Selected movie:', movie);
+            setModalVisible(true);
+          }}
+          onLongPress={() => {
+            setState({ selected: { ...movie, index } });
+            console.log('Long pressed movie:', movie);
+            Alert.alert(
+              `My ${movie.title} Review`,
+    `${movie.review || 'No Review'}\n\nRating: ${movie.myrating || 'No Rating'}`,
+    [
+                {
+                  text: 'OK',
+                  onPress: () => console.log('OK Pressed')
+                }
+              ],
+              { cancelable: true}
+              
+            );
+          }}
+          key={movie.title}
+        >
+          <View style={styles.result}>
+            <Image
+              source={{ uri: movie.poster }}
+              style={styles.listposter}
+              resizeMode='stretch'
+            />
+            <Text style={styles.heading}>{movie.title}</Text>
+          </View>
+        </TouchableHighlight>
         ))}
       </ScrollView>
 
@@ -122,10 +137,7 @@ function MyMoviesScreen(props) {
       
           <Image
             source={{ uri: selectedMovie.poster }}
-            style={{
-              width: '100%',
-              height: 600,
-            }}
+            style={styles.poster}
             resizeMode="stretch"
           />
           <View style={styles.modalContent}>
@@ -142,12 +154,13 @@ function MyMoviesScreen(props) {
             <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
             <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
             <Text style={styles.modaltext} >My Review: {state.selected.review}</Text>
+            <Text style={styles.modaltext} >My Rating:  {state.selected.myrating}/10</Text>
           </View>
           <View style={styles.buttonContainer}>
             <AppButton
               title="Close"
               onPress={handleClosePress}
-              color='#E6AF2E'
+              color={colours.third}
             />
           </View>
           </ScrollView>
@@ -162,16 +175,36 @@ const styles = StyleSheet.create({
     container: {
 
         flex:1,
-        backgroundColor: '#3F0D12',
+        backgroundColor: colours.primary,
+        borderWidth:2,
+        borderColor:colours.third,
         alignItems:'stretch',
         justifyContent: 'flex-end',
         paddingTop: 70,
         paddingHorizontal: 20,
     },
 
+    poster: {
+
+      width:'100%',
+      height:600,
+      borderWidth:10,
+      borderRadius:20,
+      borderColor:colours.third
+  },
+
+  listposter: {
+
+    width:'100%',
+    height:400,
+    borderWidth:10,
+    
+    borderColor:colours.secondary
+},
+
     buttonContainer:{
 
-        backgroundColor: '#3F0D12',
+        backgroundColor: colours.primary,
         padding:20,
        
         width:"100%",
@@ -179,7 +212,7 @@ const styles = StyleSheet.create({
     },
 
     closeButton: {
-      backgroundColor: '#E6AF2E',
+      backgroundColor: colours.third,
       padding: 10,
       borderRadius: 5,
       marginTop: 20,
@@ -189,7 +222,7 @@ const styles = StyleSheet.create({
       flex: 1,
       alignItems: 'flex-start',
       justifyContent: 'center',
-      backgroundColor: '#3F0D12',
+      backgroundColor: colours.primary,
       
     },
 
@@ -198,35 +231,38 @@ const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginBottom: 20,
       marginTop: 20,
-      color: '#FFF',
+      padding:10,
+      color: colours.white,
       fontSize: 30,
-      alignSelf:'center'
+      alignSelf:'center',
+      fontFamily:'Avenir',
     },
 
 
     title: {
-        color: '#FFF',
-        fontSize: 40,
-        fontWeight: '700',
-        textAlign: 'center',
-        alignSelf:'center',
-        marginBottom: 10,
-        fontStyle:'italic'
-
-    },
-
-    text: {
-      color: '#FFF',
-      fontSize: 30,
-      fontWeight: '500',
+      color: colours.white,
+      fontSize: 40,
+      fontFamily:'Avenir',
+      fontWeight: '600',
       textAlign: 'center',
       alignSelf:'center',
-      marginBottom: 20
+      marginBottom: 10,
+      
 
   },
 
+  text: {
+    color: colours.white,
+    fontSize: 24,
+    fontWeight: '400',
+    textAlign: 'center',
+    alignSelf:'center',
+    marginBottom: 20
+
+},
+
   modaltext: {
-    color: '#FFF',
+    color: colours.white,
     fontSize: 20,
     fontWeight: '300',
     textAlign: 'left',
@@ -242,7 +278,7 @@ const styles = StyleSheet.create({
         fontWeight:'20',
         padding:20,
         width:"100%",
-        backgroundColor:"#fff",
+        backgroundColor:colours.white,
         borderRadius:8,
         marginBottom:40,
 
@@ -250,10 +286,11 @@ const styles = StyleSheet.create({
 
     results: {
 
-        color: '#FFF',
+        color: colours.white,
         fontSize: 22,
         fontWeight: '500',
         textAlign: 'left',
+        backgroundColor:colours.primary
         
         
 
@@ -271,12 +308,12 @@ const styles = StyleSheet.create({
 
     heading: {
 
-      color:"#FFF",
+      color:colours.white,
       fontSize:22,
       fontWeight: "400",
       padding:15,
       textAlign:'center',
-      backgroundColor:"#A71D31",
+      backgroundColor:colours.third,
 
     },
 
@@ -288,26 +325,6 @@ const styles = StyleSheet.create({
         padding:20,
         textAlign:'center',
         backgroundColor:"#FFF"
-
-    },
-
-    popup: {
-
-        flex:1,
-        padding:20,
-        justifyContent: "flex-start",
-        backgroundColor: '#750a18',
-        
-
-    },
-
-    poptitle: {
-
-        fontSize:25,
-        fontWeight:"700",
-        marginTop:10,
-        marginBottom: 10,
-        alignSelf: 'center',
 
     },
 

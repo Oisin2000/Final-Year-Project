@@ -15,14 +15,21 @@ import NetInfo, {useNetInfo} from '@react-native-community/netinfo';
 import OfflineNotice from './app/components/OfflineNotice';
 import { AuthProvider } from './context/AuthContext';
 import AppNav from './app/navigation/AppNav';
+import colours from './app/config/colours';
+
 
 export default function App() {
+
+  
+  
 
   const netInfo = useNetInfo();
 
   return (
     <AuthProvider>
-      <AppNav/>
+      
+        <AppNav/>
+      
     </AuthProvider>
 
   )

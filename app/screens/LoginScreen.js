@@ -11,6 +11,8 @@ import SubmitButton from '../components/SubmitButton';
 import AppForm from '../components/AppForm';
 import authApi from '../api/auth'
 import { AuthContext } from '../../context/AuthContext';
+import colours from '../config/colours';
+
 
 
 const validationSchema = Yup.object().shape({
@@ -35,7 +37,8 @@ function LoginScreen(props) {
         <SafeAreaView style={styles.container}>
             
             <Text style={styles.title}>The Film Club</Text>
-            <Image style={styles.logo} source={require("../assets/gold-icon.png")}/>
+            <Text style={styles.subtitle}>Please enter your details to login !</Text>
+            
 
             <AppForm
                 initialValues={{email: '', password: '' }}
@@ -70,7 +73,7 @@ function LoginScreen(props) {
                         />
                         
 
-                        <AppButton title="Login" color='#E6AF2E' onPress={() => {login(email, password)}} />
+                        <AppButton title="Login" color={colours.third} onPress={() => {login(email, password)}} />
 
                         
                     
@@ -91,18 +94,32 @@ const styles = StyleSheet.create({
     container:{
         flex:1,
         padding:10,
-        backgroundColor:'#3F0D12'
+        backgroundColor:colours.primary
     },
 
     title:{
 
         alignSelf:'center',
         marginTop:100,
-        fontSize:35,
+        marginBottom:10,
+        fontSize:45,
         fontWeight:'550',
+        fontStyle:'italic',
+        color:colours.secondary,
+        
+  
+    },
+  
+    subtitle:{
+  
+        alignSelf:'center',
+        
+        fontSize:25,
+        fontWeight:'550',
+        marginBottom:100,
         color:"white",
         
-
+  
     },
 
     logo: {

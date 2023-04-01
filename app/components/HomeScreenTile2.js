@@ -1,15 +1,15 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import {MaterialCommunityIcons, FontAwesome5} from '@expo/vector-icons';
+import {Feather, FontAwesome5} from '@expo/vector-icons';
 import colours from '../config/colours';
 
-function HomeScreenTile({title, color, onPress, icon}) {
+function HomeScreenTile2({title, color, onPress, icon}) {
     return (
 
         <TouchableOpacity style={styles.smallcontainer} onPress={onPress}>
 
             
-            <FontAwesome5 name={icon} color={'#FFF'} size={25} style={styles.icon}/> 
+            <Feather name={icon} color={'#FFF'} size={25} style={styles.icon}/> 
             <Text style={styles.text}>{title}</Text>
             
         
@@ -52,4 +52,4 @@ text: {
 
 })
 
-export default HomeScreenTile;
+export default HomeScreenTile2;

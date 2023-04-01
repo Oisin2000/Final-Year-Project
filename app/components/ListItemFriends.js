@@ -1,11 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Image, TouchableHighlight, Text, SafeAreaView } from 'react-native';
 import  Swipeable  from 'react-native-gesture-handler/Swipeable';
+import colours from '../config/colours';
 
 function ListItemFriends({ title, subtitle, image, onPress, renderRightActions }) {
     return (
       <View style={styles.container}>
-        <TouchableHighlight underlayColor={'#6e6969'} onPress={onPress}>
+        <TouchableHighlight underlayColor={colours.primary} onPress={onPress}>
           <View style={styles.row}>
             <View style={styles.imageContainer}>
               {image && <Image style={styles.image} source={image} />}
@@ -22,7 +23,8 @@ function ListItemFriends({ title, subtitle, image, onPress, renderRightActions }
   
   const styles = StyleSheet.create({
     container: {
-      backgroundColor: '#3F0D12',
+      backgroundColor: colours.primary,
+      padding:10,
       width: '100%'
     },
     row: {
@@ -30,6 +32,8 @@ function ListItemFriends({ title, subtitle, image, onPress, renderRightActions }
       alignItems: 'center',
       paddingVertical: 10,
       paddingHorizontal: 20,
+      borderWidth:2,
+      borderColor:colours.third
     },
     imageContainer: {
       width: 150,
@@ -50,13 +54,15 @@ function ListItemFriends({ title, subtitle, image, onPress, renderRightActions }
     title: {
       fontWeight: '500',
       fontSize:40,
-      color:'#FFF'
+      color:'#FFF',
+      padding:10
     },
 
     subtitle: {
         fontWeight: '400',
         fontSize:20,
-        color:'#FFF'
+        color:'#FFF',
+        padding:10
       },
   });
   

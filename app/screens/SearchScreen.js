@@ -5,112 +5,72 @@ import axios from 'axios';
 import AppButton from '../components/AppButton';
 import * as Progress from 'react-native-progress';
 import AddingScreen from '../screens/AddingScreen';
+import LottieView from 'lottie-react-native';
 import AppModal from '../components/AppModal';
-import AppNavigator from '../navigation/AppNavigator';
 import { useNavigation } from '@react-navigation/native';
 import DropDownPicker from 'react-native-dropdown-picker';
+import colours from '../config/colours';
 
 function SearchScreen(props) {
 
-  const TMDB_API_KEY = '9d238a902ba51bf41bc13aded64d7960';
-    const TRENDING_MOVIES_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_API_KEY}`;
-
-  const [isRecommendedModalVisible, setIsRecommendedModalVisible] = useState(false);
-
-  const toggleRecommendedModal = () => {
-    setIsRecommendedModalVisible(!isRecommendedModalVisible);
-  };
-
-  const [selectedGenre, setSelectedGenre] = useState(null);
-    const [genremovies, setGenreMovies] = useState([]);
   
-    const fetchMoviesByGenre = (genreId) => {
-      const MOVIES_BY_GENRE_URL = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_API_KEY}&with_genres=${genreId}&vote_count.lte=7&language=en-US`;
-      fetch(MOVIES_BY_GENRE_URL)
-        .then((response) => response.json())
-        .then((data) => {
-          setGenreMovies(data.results);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    };
-  
-    useEffect(() => {
-      if (selectedGenre) {
-        fetchMoviesByGenre(selectedGenre);
-      }
-    }, [selectedGenre]);
-  
-    const renderGenreMovie = ({ item }) => (
-      <View style={styles.movieContainer}>
-        <Image
-          style={styles.moviePoster}
-          source={{ uri: `https://image.tmdb.org/t/p/w500/${item.poster_path}` }}
-        />
-        <View style={styles.movieDetails}>
-          <Text style={styles.movieTitle}>{item.title}</Text>
-          <Text style={styles.movieGenre}>{item.genre}</Text>
-        </View>
-      </View>
-    );
-  
-    const handleGenreSelect = (genreId) => {
-      setSelectedGenre(genreId);
-    };
-
-  
-
-    const genres = [
-        { label: 'Select a genre', value: null },
-        { label: 'Action', value: '28' },
-        { label: 'Comedy', value: '35' },
-        { label: 'Drama', value: '18' },
-        { label: 'Science Fiction', value: '878' },
-        { label: 'Thriller', value: '53' },
-      ];
+  const [state, setState] = React.useState({
+    results: [],
+    selected: { index: -1 },
+  });
+ 
 
     const [showAddingScreen, setShowAddingScreen] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [detailsModalVisible, setDetailsModalVisible] = useState(false);
+    
+
+    const navigation = useNavigation();
 
 
     const apiurl = "http://www.omdbapi.com/?i=tt3896198&apikey=99fcef07"
 
     const [showModal, setShowModal] = useState(false);
+    const [favouriteModal, setFavouritesModal] = useState(false);
+    const [movies, setMovies] = useState([]);
+    const [isAdding, setIsAdding] = useState(false);
+    const [isAddingDetails, setIsAddingDetails] = useState(false);
 
-    const [state, setState] = useState({
+    const [searchstate, setSearchState] = useState({
 
         s: "",
-        results: [],
-        selected: {},
+        searchresults: [],
+        selectedfromSearch: {},
         userMovies: [],
 
     });
 
     const search = () => {
-      if (!state.s.trim()) {
+      if (!searchstate.s.trim()) {
         return;
       }
     
-      axios(apiurl + "&s=" + state.s).then(({ data }) => {
-        let results = data.Search
-        if (!results) {
+      axios(apiurl + "&s=" + searchstate.s).then(({ data }) => {
+        let searchresults = data.Search
+        if (!searchresults) {
           setShowModal(true);
-          setState(prevState => ({...prevState, results: []}));
+          setSearchState(prevState => ({...prevState, searchresults: []}));
         } else {
-          setState(prevState => ({...prevState, results}));
+          setSearchState(prevState => ({...prevState, searchresults}));
         }
       });
     };
   
 
+    const [searchResult, setSearchResult] = useState(null);
     const [result, setResult] = useState(null);
 
     const openPopup = (id) => {
       axios(apiurl + "&t=" + id)
         .then(({ data }) => {
-          setResult(data);
-          setState((prevState) => {
-            return { ...prevState, selected: data };
+          setSearchResult(data);
+          setSearchState((prevState) => {
+            return { ...prevState, selectedfromSearch: data };
           });
         })
         .catch((error) => {
@@ -121,14 +81,14 @@ function SearchScreen(props) {
     const handAddRecommended = () => {
 
 
-      const { imdb_votes, ...data } = result;
+      const { imdb_votes, ...data } = searchResult;
 
     fetch('http://172.20.10.2:5000/recommendedmovies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(result),
+      body: JSON.stringify(searchResult),
     })
       .then(response => response.json())
       .then(data => {
@@ -144,71 +104,76 @@ function SearchScreen(props) {
   };
 
   const handleOkPress = () => {
-    Alert.prompt(result.Title, "Please leave a review", review => {
-      if (review !== null) {
-        const { imdb_votes, ...data } = result;
-        data.review = review;
-        fetch('http://172.20.10.2:5000/save-movie-data', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data),
-        })
-          .then(response => response.json())
-          .then(data => {
-            console.log('Movie data saved:', data);
-          })
-          .catch(error => {
-            console.error('Error saving movie data:', error);
-          });
-      }
-    });
+    let reviewText = '';
+    let myratingText = '';
+    Alert.prompt(
+      searchResult.Title,
+      "Please leave a review",
+      review => {
+        if (review !== null) {
+          reviewText = review;
+          Alert.prompt(
+            searchResult.Title,
+            "Please enter a rating out of 10",
+            myrating => {
+              if (myrating !== null) {
+                myratingText = myrating;
+                setIsAdding(true);
+                const { imdb_votes, ...data } = searchResult;
+                data.review = reviewText;
+                data.myrating = myratingText;
+                fetch('http://172.20.10.2:5000/save-movie-data', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(data),
+                })
+                  .then(response => response.json())
+                  .then(data => {
+                    console.log('Movie data saved:', data);
+                  })
+                  .catch(error => {
+                    console.error('Error saving movie data:', error);
+                  }).finally(() => {
+                    setTimeout(() => {
+                      setIsAdding(false);
+                    }, 2000);  // set a 2 second delay before setting setIsAdding to false
+                  });
+              }
+            },
+            'plain-text',
+            null,
+            'numeric',
+          );
+        }
+      },
+      'plain-text',
+      null,
+      'default',
+    );
   };
 
   const handleModalOk = () => {
     setShowModal(false);
-    navigation.navigate('Login');
+    
   };
     
-    const handleAddMovie = () => {
-
-
-        const { imdb_votes, ...data } = result;
-
-      fetch('http://172.20.10.2:5000/save-movie-data', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(result),
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Movie data saved:', data);
-          
-        })
-        .catch(error => {
-          console.error('Error saving movie data:', error);
-        });
-
     
-       
-    };
 
 
     const handleAddWatchList = () => {
 
        
-
-        const { imdb_votes, ...data } = result;
+      setIsAdding(true);
+        const { imdb_votes, ...data } = searchResult;
 
       fetch('http://172.20.10.2:5000/watchlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(result),
+        body: JSON.stringify(searchResult),
       })
         .then(response => response.json())
         .then(data => {
@@ -217,6 +182,10 @@ function SearchScreen(props) {
         })
         .catch(error => {
           console.error('Error saving movie data:', error);
+        }).finally(() => {
+          setTimeout(() => {
+            setIsAdding(false);
+          }, 2000);  // set a 2 second delay before setting setIsAdding to false
         });
 
 
@@ -224,59 +193,229 @@ function SearchScreen(props) {
        
     };
 
+    const fetchMovies = () => {
+      fetch('http://172.20.10.2:5000/recommendedmovies')
+        .then((response) => response.json())
+        .then((data) => {
+          console.log('All movies:', data);
+          const movieObjects = data.map((movie) => {
+            return {
+              actors: movie.actors,
+              awards: movie.awards,
+              box_office: movie.box_office,
+              country: movie.country,
+              director: movie.director,
+              dvd: movie.dvd,
+              genre: movie.genre,
+              imdb_id: movie.imdb_id,
+              imdb_rating: movie.imdb_rating,
+              imdb_votes: movie.imdb_votes,
+              language: movie.language,
+              metascore: movie.metascore,
+              plot: movie.plot,
+              poster: movie.poster,
+              production: movie.production,
+              rated: movie.rated,
+              released: movie.released,
+              runtime: movie.runtime,
+              title: movie.title,
+              type: movie.type,
+              website: movie.website,
+              writer: movie.writer,
+              year: movie.year,
+            };
+          });
+          setMovies(movieObjects);
+          setState((prevState) => {
+            return { ...prevState, results: movieObjects, refreshing: false }; // set refreshing to false
+          });
+        })
+        .catch((error) => {
+          console.error('Error fetching movies:', error);
+          setState((prevState) => {
+            return { ...prevState, refreshing: false }; // set refreshing to false
+          });
+        });
+    };
+
+   
+
+  const handleClosePress = () => {
+    setDetailsModalVisible(false);
+    
+  };
+    const selectedMovie = state.selected; // selected movie object
+    const selectedMovieIndex = selectedMovie.index; // selected movie index
+  
+    const selectedMovieData = {
+      actors: selectedMovie.actors,
+      awards: selectedMovie.awards,
+      box_office: selectedMovie.box_office,
+      country: selectedMovie.country,
+      director: selectedMovie.director,
+      dvd: selectedMovie.dvd,
+      genre: selectedMovie.genre,
+      imdb_id: selectedMovie.imdb_id,
+      imdb_rating: selectedMovie.imdb_rating,
+      imdb_votes: selectedMovie.imdb_votes,
+      language: selectedMovie.language,
+      metascore: selectedMovie.metascore,
+      plot: selectedMovie.plot,
+      poster: selectedMovie.poster,
+      production: selectedMovie.production,
+      rated: selectedMovie.rated,
+      released: selectedMovie.released,
+      runtime: selectedMovie.runtime,
+      title: selectedMovie.title,
+      type: selectedMovie.type,
+      website: selectedMovie.website,
+      writer: selectedMovie.writer,
+      year: selectedMovie.year,
+    };
+  
+    const handleAddMovie = () => {
+      // Prompt the user to enter a review
+      let reviewText = '';
+      let myratingText = '';
+      Alert.prompt(
+        selectedMovie.title,
+        "Please leave a review",
+        review => {
+          if (review !== null) {
+            reviewText = review;
+            Alert.prompt(
+              selectedMovie.title,
+              "Please enter a rating out of 10",
+              myrating => {
+                if (myrating !== null) {
+                  myratingText = myrating;
+              setIsAddingDetails(true);
+              const data = { ...selectedMovieData, review: review || 'No Review', myrating: myrating || 'No Rating'};
+    
+              // Make a request to add the movie to mymovies
+              fetch('http://172.20.10.2:5000/add-mymovies-from-recommended', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              })
+              .then(response => {
+                console.log(response.status); // log the response status code
+                if (!response.ok) {
+                  throw new Error('Network response was not ok');
+                }
+                return response.json();
+              })
+              .then(data => {
+                console.log('Data received:', data.message);
+              })
+              .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+              }).finally(() => {
+                setTimeout(() => {
+                  setIsAddingDetails(false);
+                }, 2000);  // set a 2 second delay before setting setIsAdding to false
+              });
+          }
+        },
+        'plain-text',
+        null,
+        'numeric',
+      );
+    }
+  },
+  'plain-text',
+  null,
+  'default',
+);
+    };
+
+    const handleAddWatch = () => {
+      setIsAddingDetails(true);
+      const data = { ...selectedMovieData};
+
+      // Make a request to add the movie to mymovies
+      fetch('http://172.20.10.2:5000/add-watchlist-from-recommended', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => {
+        console.log(response.status); // log the response status code
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data received:', data.message);
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      }).finally(() => {
+        setTimeout(() => {
+          setIsAddingDetails(false);
+        }, 2000);  // set a 2 second delay before setting setIsAdding to false
+      });
+    };
+
+    
+  
+  
+    useEffect(() => {
+      fetchMovies();
+    }, []);
 
 
     return (
+
+      
         
         <View style = {styles.container}>
+
+          
+          
+          
+
+          <Text style = {styles.text}>Find your next favorite movie with our search feature!</Text>
 
             <TextInput 
 
             placeholder='Enter a movie ...'
             
             style = {styles.searchbox}
-            onChangeText={text => setState(prevState => {
+            onChangeText={text => setSearchState(prevState => {
                 return {...prevState, s: text}
             })}
             onSubmitEditing={search}
-            value = {state.s}
+            value = {searchstate.s}
 
             />
 
-          <DropDownPicker
-                visible={isRecommendedModalVisible}
-                items={genres}
-                defaultValue={selectedGenre}
-                placeholder="Select a genre"
-                containerStyle={{ height: 40 }}
-                style={styles.dropdown}
-                itemStyle={{ justifyContent: 'flex-start' }}
-                dropDownStyle={{ backgroundColor: '#fafafa', marginTop: 10 , zIndex:9999}}
-                onChangeItem={(item) => handleGenreSelect(item.value)}
-              />
+          
             
             {showModal && <AppModal visible={showModal} animationType="slide" transparent={true} onPress={handleModalOk} title='No Results Found' />}
 
             <ScrollView style={styles.results}>
 
 
-                {state.results.map(result => (
+                {searchstate.searchresults.map(searchResult => (
 
                     <TouchableOpacity 
-                    key={result.imdbID} 
-                    onPress={() => openPopup(result.Title)}
+                    key={searchResult.imdbID} 
+                    onPress={() => openPopup(searchResult.Title)}
                     >
 
                     <View  style={styles.result}>
                         <Image
-                        source={{uri: result.Poster}}
-                        style={{
-                            width:"100%",
-                            height:300,
-                        }}
+                        source={{uri: searchResult.Poster}}
+                        style={styles.searchRecposter}
                         resizeMode="stretch"
                         />
-                        <Text style={styles.heading}>{result.Title}</Text>
+                        <Text style={styles.heading}>{searchResult.Title}</Text>
                         
                         
                         
@@ -293,37 +432,43 @@ function SearchScreen(props) {
             <Modal 
             animationType='slide'
             transparent={false}
-            visible={(typeof state.selected.Title != "undefined")}
+            visible={(typeof searchstate.selectedfromSearch.Title != "undefined")}
             
             >
+              {isAdding && (
+                    <View style={styles.addingContainer}>
+              <AddingScreen setIsAdding={setIsAdding} />
+                    </View>
+                  )}
                <ScrollView
                 style={styles.results}
                 >
                 
               
                   <Image
-                    source={{ uri: state.selected.Poster }}
-                    style={{
-                      width: '100%',
-                      height: 600,
-                    }}
+                    source={{ uri: searchstate.selectedfromSearch.Poster }}
+                    style={styles.poster}
                     resizeMode="stretch"
                   />
 
-                <Text style={styles.modalTitle}>{state.selected.Title}</Text>
-                <Text style={styles.modaltext}>Rating: {state.selected.imdbRating}</Text>
-                <Text style={styles.modaltext} >Cast: {state.selected.Actors}</Text>
-                <Text style={styles.modaltext} >Director: {state.selected.Director}</Text>
-                <Text style={styles.modaltext} >Genre: {state.selected.Genre}</Text>
-                <Text style={styles.modaltext} >Plot: {state.selected.Plot}</Text>
-                <Text style={styles.modaltext} >Awards: {state.selected.Awards}</Text>
+                <Text style={styles.modalTitle}>{searchstate.selectedfromSearch.Title}</Text>
+                <Text style={styles.modaltext}>Rating: {searchstate.selectedfromSearch.imdbRating}</Text>
+                <Text style={styles.modaltext} >Cast: {searchstate.selectedfromSearch.Actors}</Text>
+                <Text style={styles.modaltext} >Director: {searchstate.selectedfromSearch.Director}</Text>
+                <Text style={styles.modaltext} >Genre: {searchstate.selectedfromSearch.Genre}</Text>
+                <Text style={styles.modaltext} >Plot: {searchstate.selectedfromSearch.Plot}</Text>
+                <Text style={styles.modaltext} >Awards: {searchstate.selectedfromSearch.Awards}</Text>
                 <View style={styles.buttonContainer}>
-                <AppButton title="Add to my movies"   onPress={() => {handleOkPress()} }/>
-                <AppButton title="Add to my watchlist"   onPress={() => {handleAddWatchList()} }/>
                 
-                <AppButton title="Close"   color= "#E6AF2E" onPress={() => setState(prevState => {
+                <AppButton title="Add to my movies" color= {colours.white}  onPress={() => {handleOkPress()} }/>
+                <AppButton title="Add to my watchlist" color= {colours.secondary}  onPress={() => {handleAddWatchList()} }/>
+                <Modal visible={isAdding} animationType={'fade'}>
+                <AddingScreen setIsAdding={setIsAdding} />
+                </Modal>
+                      
+                <AppButton title="Close"   color= {colours.third} onPress={() => setSearchState(prevState => {
 
-                return {...prevState, selected: {} }
+                return {...prevState, selectedfromSearch: {} }
 
                 })}/>
                 </View>
@@ -333,7 +478,87 @@ function SearchScreen(props) {
 
                 
             </Modal>
-
+            
+            <View style={styles.buttonContainer}>
+                <AppButton title={'See some of our favourites !'} color={colours.third} onPress={() => setFavouritesModal(true)}/>
+                </View>
+                <Modal visible={favouriteModal} animationType='slide'>
+                  <View style={styles.favouritecontainer}>
+                    <Text style={styles.modalsubTitle}>Some of our favourites from all genres !</Text>
+                  <ScrollView
+        style={styles.modalResults}
+       
+      >
+        {movies.map((movie, index) => (
+          <TouchableHighlight
+            onPress={() => {
+              setState({ selected: { ...movie, index } });
+              console.log('Selected movie:', movie);
+              setDetailsModalVisible(true); // set modal state to true when a movie is selected
+            }}
+            key={movie.title}
+          >
+            <View style={styles.results}>
+              <Image
+                source={{ uri: movie.poster }}
+                style={styles.searchRecposter}
+                resizeMode='stretch'
+              />
+              <Text style={styles.heading}>{movie.title}</Text>
+            </View>
+          </TouchableHighlight>
+        ))}
+        
+        </ScrollView>
+        <View style={styles.buttonContainer}>
+        <AppButton color={colours.third} title='Close' onPress={() => setFavouritesModal(false)}/>
+        </View>
+        </View>
+        <Modal visible={detailsModalVisible} animationType="slide">
+      <ScrollView
+        style={styles.results}
+        >
+        
+      
+          <Image
+            source={{ uri: selectedMovie.poster }}
+            style={styles.poster}
+            resizeMode="stretch"
+          />
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{selectedMovie.title}</Text>
+            <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
+            <Text style={styles.modaltext}>Director: {selectedMovie.director}</Text>
+            <Text style={styles.modaltext}>Genre: {selectedMovie.genre}</Text>
+            <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
+            <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
+            <Text style={styles.modaltext}>Box Office: {selectedMovie.box_office}</Text>
+            <Text style={styles.modaltext}>Run Time: {selectedMovie.runtime}</Text>
+            <Text style={styles.modaltext}>Released: {selectedMovie.released}</Text>
+            <Text style={styles.modaltext}>Rated: {selectedMovie.rated}</Text>
+            <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
+            <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <AppButton
+              title="Add to my Movies"
+              onPress={handleAddMovie}
+              color={colours.secondary}
+            />
+            <AppButton title="Add to my watchlist" color={colours.white}  onPress={() => {handleAddWatch()} }/>
+            <AppButton
+              title="Close"
+              onPress={handleClosePress}
+              color={colours.third}
+            />
+            <Modal visible={isAddingDetails} animationType={'fade'}>
+                <AddingScreen setIsAdding={setIsAddingDetails} />
+                </Modal>
+          </View>
+          </ScrollView>
+        </Modal>
+      </Modal>
+      
         </View>
 
     );
@@ -346,97 +571,198 @@ const styles = StyleSheet.create({
 
     container: {
 
-        flex:10,
-        backgroundColor: '#3F0D12',
+        flex:20,
+        backgroundColor: colours.primary,
+        borderWidth:2,
+        borderColor:colours.secondary,
         alignItems: 'center',
         justifyContent: 'flex-end',
-        paddingTop: 100,
+        paddingTop: 70,
         paddingHorizontal: 20,
+        zIndex:9999,
         
     },
 
-    buttonContainer:{
+    favouritecontainer: {
 
-        backgroundColor: '#3F0D12',
-        padding:20,
-        width:"100%",
-        justifyContent:'flex-end',
-        marginBottom:20
-    },
+      flex:1,
+      backgroundColor: colours.primary,
+        borderWidth:2,
+        borderColor:colours.third,
+      alignItems:'stretch',
+      justifyContent: 'flex-end',
+      paddingTop: 60,
+      paddingHorizontal: 20,
+  },
+
+  addingContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    zIndex: 9999,
+  },
+
+    poster: {
+
+      width:'100%',
+      height:600,
+      borderWidth:10,
+      borderRadius:20,
+      borderColor:colours.third
+  },
+
+  searchposter: {
+
+    width:'100%',
+    height:600,
+    borderWidth:10,
+    
+    borderColor:colours.secondary
+},
+
+searchRecposter: {
+
+  width:'100%',
+  height:300,
+  borderWidth:10,
+  
+  borderColor:colours.secondary
+},
+
+buttonContainer:{
+
+  backgroundColor: colours.primary,
+  padding:5,
+  marginBottom:0,
+  width:"100%",
+  justifyContent:'flex-end'
+},
 
 
-    title: {
-        color: '#FFF',
-        fontSize: 50,
-        fontWeight: '700',
-        textAlign: 'center',
-        marginBottom: 20
+title: {
+  color: colours.white,
+  fontSize: 40,
+  fontFamily:'Avenir',
+  fontWeight: '600',
+  textAlign: 'center',
+  alignSelf:'center',
+  marginBottom: 10,
+  
 
-    },
+},
+
+text: {
+color: colours.white,
+fontSize: 24,
+fontWeight: '400',
+textAlign: 'center',
+alignSelf:'center',
+marginBottom: 20
+
+},
 
     searchbox: {
 
-        fontSize:20,
+        fontSize:18,
         fontWeight:'20',
-        padding:20,
+        padding:15,
         width:"100%",
-        backgroundColor:"#FFF",
-        borderRadius:8,
-        marginBottom:40,
+        backgroundColor:colours.white,
+        borderRadius:30,
+        marginBottom:10,
 
     },
+
+    
 
     results: {
 
-        backgroundColor: '#3F0D12',
-        fontSize: 22,
-        fontWeight: '600',
-        textAlign: 'left',
-        
-        padding: 20,
+      color: colours.white,
+      fontSize: 22,
+      fontWeight: '500',
+      textAlign: 'left',
+      backgroundColor:colours.primary,
+    
+      paddingBottom:30,
+      
+      
+      
+      
 
-    },
+  },
 
-    result: {
+  result: {
 
-        flex:1,
-        width:"100%",
-        marginBottom: 20
-        
+    
+    width:"100%",
+    
+    padding:20
+    
 
-    },
+},
 
     heading: {
 
-      color:"#FFF",
+      color:colours.white,
       fontSize:22,
       fontWeight: "400",
       padding:15,
       textAlign:'center',
-      backgroundColor:"#A71D31",
+      backgroundColor:colours.third,
 
     },
 
     modaltext: {
-      color: '#FFF',
+      color: colours.white,
       fontSize: 20,
       fontWeight: '300',
-      textAlign: 'left',
+      textAlign: 'center',
       alignSelf:'center',
-      marginBottom: 20,
+      marginBottom: 10,
       padding:15
   
   },
 
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: '600',
     marginBottom: 20,
     marginTop: 20,
-    color: '#FFF',
+    padding:10,
+    color: colours.white,
     fontSize: 30,
     alignSelf:'center',
+    textAlign:'center',
     fontFamily:'Avenir',
+  },
+
+  modalsubTitle: {
+    fontSize: 28,
+    fontWeight: '400',
+    
+    padding:10,
+    color: colours.white,
+    fontSize: 30,
+    alignSelf:'center',
+    textAlign:'center',
+    fontFamily:'Avenir',
+  },
+
+  modalResults:{
+    color: colours.white,
+        fontSize: 22,
+        fontWeight: '500',
+        textAlign: 'left',
+        backgroundColor:colours.primary,
+        width:'100%',
+        padding:45
+      
+    
   },
 
     AddtoMyList: {
@@ -450,25 +776,8 @@ const styles = StyleSheet.create({
 
     },
 
-    popup: {
 
-        flex:1,
-        padding:20,
-        justifyContent: "flex-start",
-        backgroundColor: '#750a18',
-        
 
-    },
-
-    poptitle: {
-
-        fontSize:25,
-        fontWeight:"700",
-        marginTop:10,
-        marginBottom: 10,
-        alignSelf: 'center',
-
-    },
 
 
     

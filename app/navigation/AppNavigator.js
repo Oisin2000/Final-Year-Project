@@ -12,6 +12,7 @@ import HomeScreen from '../screens/HomeScreen';
 import HomeScreen2 from '../screens/HomeScreen2';
 import { StackActions } from '@react-navigation/native';
 import TrendingNavigator from './TrendingNav';
+import AddingScreen from '../screens/AddingScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -80,8 +81,8 @@ const AppNavigator = () => (
         />
 
         <Tab.Screen 
-            name="TrendingNavigator"
-            component={TrendingNavigator}
+            name="Adding Screen"
+            component={AddingScreen}
             options={{ tabBarButton: () => null }}
         />
 
