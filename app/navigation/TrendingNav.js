@@ -1,6 +1,6 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import TrendingMoviesScreen from '../screens/TrendingMoviesScreen';
+import React from "react";
+import { createStackNavigator } from "@react-navigation/stack";
+import TrendingMoviesScreen from "../screens/TrendingMoviesScreen";
 
 const TrendingNav = createStackNavigator();
 
