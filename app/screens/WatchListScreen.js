@@ -28,7 +28,7 @@ function WatchListScreen(props) {
 
 
   const fetchMovies = () => {
-    fetch('http://172.20.10.2:5000/watchlist')
+    fetch('https://thawing-shore-72198.herokuapp.com/watchlist')
       .then((response) => response.json())
       .then((data) => {
         console.log('All movies:', data);
@@ -59,6 +59,7 @@ function WatchListScreen(props) {
             year: movie.year,
           };
         });
+        movieObjects.reverse();
         setMovies(movieObjects);
         setState((prevState) => {
           return { ...prevState, results: movieObjects, refreshing: false }; // set refreshing to false
@@ -119,7 +120,7 @@ function WatchListScreen(props) {
                 const data = { ...selectedMovieData, review: review || 'No Review', myrating: myrating || 'No Rating' };
   
                 // Make a request to remove the selected movie from the watchlist
-                fetch('http://172.20.10.2:5000/remove-watchlist', {
+                fetch('https://thawing-shore-72198.herokuapp.com/remove-watchlist', {
                   method: 'POST',
                   body: JSON.stringify(selectedMovieData),
                   headers: {
@@ -133,7 +134,7 @@ function WatchListScreen(props) {
                   }
   
                   // Make a request to add the movie to mymovies
-                  fetch('http://172.20.10.2:5000/add-mymovies-from-watchlist', {
+                  fetch('https://thawing-shore-72198.herokuapp.com/add-mymovies-from-watchlist', {
                     method: 'POST',
                     body: JSON.stringify(data),
                     headers: {
@@ -182,6 +183,36 @@ function WatchListScreen(props) {
     });
     fetchMovies();
   };
+
+  const handleRemoveMovie = () => {
+    setIsAdding(true); // set isAdding to true here
+  
+    // Make a request to remove the selected movie from the watchlist
+    fetch('https://thawing-shore-72198.herokuapp.com/remove-watchlist', {
+      method: 'POST',
+      body: JSON.stringify(selectedMovieData),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log(response.status); // log the response status code
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+    })
+    .catch(error => {
+      console.error('There was a problem with the fetch operation:', error);
+    })
+    .finally(() => {
+      setTimeout(() => {
+        setIsAdding(false);
+        onRefresh();
+      }, 2000); // set a 2-second delay before setting setIsAdding to false
+    });
+  };
+  
+  
 
       
 
@@ -250,6 +281,11 @@ function WatchListScreen(props) {
               title="Add to my Movies"
               onPress={handleAddMovie}
               color={colours.secondary}
+            />
+            <AppButton
+              title="Remove from Watchlist"
+              onPress={handleRemoveMovie}
+              color={colours.white}
             />
             <AppButton
               title="Close"
@@ -332,14 +368,13 @@ const styles = StyleSheet.create({
       color: colours.white,
       fontSize: 30,
       alignSelf:'center',
-      fontFamily:'Avenir',
+      
     },
 
 
     title: {
         color: colours.white,
         fontSize: 40,
-        fontFamily:'Avenir',
         fontWeight: '600',
         textAlign: 'center',
         alignSelf:'center',

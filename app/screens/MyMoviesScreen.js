@@ -22,7 +22,7 @@ function MyMoviesScreen(props) {
   };
 
   const fetchMovies = () => {
-    fetch('http://172.20.10.2:5000/mymovies')
+    fetch('https://thawing-shore-72198.herokuapp.com/mymovies')
       .then((response) => response.json())
       .then((data) => {
         console.log('All movies:', data);
@@ -54,6 +54,7 @@ function MyMoviesScreen(props) {
             myrating: movie.myrating
           };
         });
+        movieObjects.reverse();
         setMovies(movieObjects);
         setState((prevState) => {
           return { ...prevState, results: movieObjects, refreshing: false }; // set refreshing to false
@@ -103,7 +104,7 @@ function MyMoviesScreen(props) {
             console.log('Long pressed movie:', movie);
             Alert.alert(
               `My ${movie.title} Review`,
-    `${movie.review || 'No Review'}\n\nRating: ${movie.myrating || 'No Rating'}`,
+    `Review: ${movie.review || 'No Review'}\n\nRating: ${movie.myrating || 'No Rating'}`,
     [
                 {
                   text: 'OK',
@@ -235,14 +236,14 @@ const styles = StyleSheet.create({
       color: colours.white,
       fontSize: 30,
       alignSelf:'center',
-      fontFamily:'Avenir',
+      
     },
 
 
     title: {
       color: colours.white,
       fontSize: 40,
-      fontFamily:'Avenir',
+      
       fontWeight: '600',
       textAlign: 'center',
       alignSelf:'center',

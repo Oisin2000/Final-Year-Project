@@ -83,7 +83,7 @@ function SearchScreen(props) {
 
       const { imdb_votes, ...data } = searchResult;
 
-    fetch('http://172.20.10.2:5000/recommendedmovies', {
+    fetch('https://thawing-shore-72198.herokuapp.com/recommendedmovies', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ function SearchScreen(props) {
                 const { imdb_votes, ...data } = searchResult;
                 data.review = reviewText;
                 data.myrating = myratingText;
-                fetch('http://172.20.10.2:5000/save-movie-data', {
+                fetch('https://thawing-shore-72198.herokuapp.com/save-movie-data', {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ function SearchScreen(props) {
       setIsAdding(true);
         const { imdb_votes, ...data } = searchResult;
 
-      fetch('http://172.20.10.2:5000/watchlist', {
+      fetch('https://thawing-shore-72198.herokuapp.com/watchlist', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -194,7 +194,7 @@ function SearchScreen(props) {
     };
 
     const fetchMovies = () => {
-      fetch('http://172.20.10.2:5000/recommendedmovies')
+      fetch('https://thawing-shore-72198.herokuapp.com/recommendedmovies')
         .then((response) => response.json())
         .then((data) => {
           console.log('All movies:', data);
@@ -293,7 +293,7 @@ function SearchScreen(props) {
               const data = { ...selectedMovieData, review: review || 'No Review', myrating: myrating || 'No Rating'};
     
               // Make a request to add the movie to mymovies
-              fetch('http://172.20.10.2:5000/add-mymovies-from-recommended', {
+              fetch('https://thawing-shore-72198.herokuapp.com/add-mymovies-from-recommended', {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: {
@@ -336,7 +336,7 @@ function SearchScreen(props) {
       const data = { ...selectedMovieData};
 
       // Make a request to add the movie to mymovies
-      fetch('http://172.20.10.2:5000/add-watchlist-from-recommended', {
+      fetch('https://thawing-shore-72198.herokuapp.com/add-watchlist-from-recommended', {
         method: 'POST',
         body: JSON.stringify(data),
         headers: {
@@ -647,7 +647,6 @@ buttonContainer:{
 title: {
   color: colours.white,
   fontSize: 40,
-  fontFamily:'Avenir',
   fontWeight: '600',
   textAlign: 'center',
   alignSelf:'center',
@@ -738,7 +737,6 @@ marginBottom: 20
     fontSize: 30,
     alignSelf:'center',
     textAlign:'center',
-    fontFamily:'Avenir',
   },
 
   modalsubTitle: {
@@ -750,7 +748,7 @@ marginBottom: 20
     fontSize: 30,
     alignSelf:'center',
     textAlign:'center',
-    fontFamily:'Avenir',
+    
   },
 
   modalResults:{

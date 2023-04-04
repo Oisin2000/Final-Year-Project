@@ -16,7 +16,9 @@ import AddingScreen from '../screens/AddingScreen';
 
 const Tab = createBottomTabNavigator();
 
-const AppNavigator = () => (
+const AppNavigator = ({refresh}) => (
+
+    
 
     <Tab.Navigator>
         <Tab.Screen 
@@ -68,17 +70,17 @@ const AppNavigator = () => (
             }}
         />
 
-        <Tab.Screen 
-        name="My Account" 
-        component={AccountScreen} 
-        options={{
-
-            tabBarIcon: ({color, size}) =>
-            <MaterialCommunityIcons name="account" color={color} size={size}/>,
-
-            headerShown: false
+        <Tab.Screen
+            name="My Account"
+            options={{
+                tabBarIcon: ({ color, size }) => (
+                <MaterialCommunityIcons name="account" color={color} size={size} />
+                ),
+                headerShown: false,
             }}
-        />
+            >
+      {(props) => <AccountScreen {...props} refresh={refresh} />}
+    </Tab.Screen>
 
         <Tab.Screen 
             name="Adding Screen"

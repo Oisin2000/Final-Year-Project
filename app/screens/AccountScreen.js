@@ -10,11 +10,19 @@ import { Modal } from 'react-native';
 import { TouchableOpacity } from 'react-native-web';
 import AppButton from '../components/AppButton';
 
+function AccountScreen({refresh})  {
 
-function AccountScreen(props) {
+ 
 
     const {logout} = useContext(AuthContext);
     const [isThemeModalVisible, setIsThemeModalVisible] = useState(false);
+
+    
+
+    const handleSelection = (themeName) => {
+      setTheme(themeName);
+      setIsThemeModalVisible(false);
+    };
     
 
   return (
@@ -31,17 +39,18 @@ function AccountScreen(props) {
       <View style={styles.buttoncontainer}>
       <AppButton title={'Change theme'} onPress={() => setIsThemeModalVisible(true)} />
         <AppButton color={colours.third} title='Sign Out' onPress={() => { logout() }} />
+        
       </View>
       <Modal visible={isThemeModalVisible} animationType={'slide'} transparent={true}>
       <View style={styles.modalContainer}>
           <View style={styles.modalView}>
             <Text style={styles.modaltitle}>Select Theme</Text>
             <AppButton onPress={() => handleSelection('Original')} title="Original" color='#00FFFF'/>
-            <AppButton onPress={() => handleSelection('Fiery Sunset')} title="Fiery Sunset" color='#8B0000'/>
-            <AppButton onPress={() => handleSelection('Midnight Noir')} title="Midnight Noir" color='#E2D6DB'/>
-            <AppButton onPress={() => handleSelection('Enchanted Forest')} title="Enchanted Forest" color='#D62AD0' />
-            <AppButton onPress={() => handleSelection('Vibrant Sunrise')} title="Vibrant Sunrise" color='#F44336'/>
-            <AppButton onPress={() => handleSelection('Grassy Grove')} title="Grassy Grove" color='#4CAF50'/>
+            <AppButton onPress={() => handleSelection('FierySunset')} title="Fiery Sunset" color='#8B0000'/>
+            <AppButton onPress={() => handleSelection('MidnightNoir')} title="Midnight Noir" color='#E2D6DB'/>
+            <AppButton onPress={() => handleSelection('EnchantedForest')} title="Enchanted Forest" color='#D62AD0' />
+            <AppButton onPress={() => handleSelection('VibrantSunrise')} title="Vibrant Sunrise" color='#F44336'/>
+            <AppButton onPress={() => handleSelection('GrassyGrove')} title="Grassy Grove" color='#4CAF50'/>
             <Button onPress={() => setIsThemeModalVisible(false)}  title="Close"></Button>
             
             

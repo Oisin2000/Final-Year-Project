@@ -1,49 +1,58 @@
-export default {
+const themes = {
+    Original: {
+        primary: '#0D0D0D',
+        secondary: '#00FFFF',
+        third: '#F72585',
+        white: '#FFF'
+      },
 
-     
+      FierySunset: {
+        primary: '#FF6B35',
+        secondary: '#FDD835',
+        third: '#E53935',
+        white: '#FFF',
+      },
 
-    primary: '#0D0D0D',
-    secondary: '#00FFFF',
-   third: '#F72585',
-    white: '#FFF',
+      MidnightNoir: {
+        primary: '#1C1C1C',
+        secondary: '#34495E',
+        third: '#D0D0D0',
+        white: '#FFF',
+      },
 
-    //grey minimalist
-    //primary: '#2D2926',
-   // secondary: '#E0DFDB',
-  // third: '#B09C85',
-   // white: '#FFF',
+      EnchantedForest: {
+        primary: '#2E7D32',
+        secondary: '#558B2F',
+        third: '#9CCC6',
+        white: '#FFF'
+      },
 
+      VibrantSunrise: {
+        primary: '#FF9800',
+        secondary: '#FFC107',
+        third: '#FF5722',
+        white: '#FFF'
+      },
 
-    //Brigh Orange
-   // primary: '#FF4500',
-    //  secondary: '#1A1A1D',
-     //third: '#00BFFF',
-     // white: '#FFF',
-
-
-     //Very Bright
-      //primary: '#F44336',
-      //secondary: '#FFC107',
-     // third: '#03A9F4',
-      //white: '#FFF',
-
-      //Dark + Purple
-      //primary: '#1B1B1B',
-      //secondary: '#E6AF2E',
-      //third: '#D62AD0',
-     // white: '#FFF',
-
-     //Grey + Orange
-      //primary: '#1C1C1E',
-     // secondary: '#E2D6DB',
-     // third: '#FF4B4B',
-     // white: '#FFF',
-
-
-      //Original
-      //primary: '#3F0D12',
-      //secondary: '#E6AF2E',
-      //third: '#A71D31',
-      //white: '#FFF',
-   
+      GrassyGrove: {
+        primary: '#4CAF50',
+        secondary: '#8BC34A',
+        third: '#CDDC39',
+        white: '#FFF'
+      }
+    // Add other themes similarly
   };
+  
+  let activeTheme = themes.Original;
+  
+  const setActiveTheme = (themeName) => {
+    activeTheme = themes[themeName];
+  };
+  
+  const colours = {
+    ...activeTheme,
+    setActiveTheme,
+  };
+  
+  export default colours;
+  

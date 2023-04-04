@@ -11,7 +11,7 @@ export const AuthContext = createContext();
 
     const register = (email, password) => {
         setIsLoading(true);
-        axios.post('http://172.20.10.2:5000/register', {
+        axios.post('https://thawing-shore-72198.herokuapp.com/register', {
           email,
           password
         })
@@ -30,7 +30,7 @@ export const AuthContext = createContext();
 
     const login = (email, password) => {
         setIsLoading(true);
-        axios.post('http://172.20.10.2:5000/login', {
+        axios.post('https://thawing-shore-72198.herokuapp.com/login', {
             email,
             password
         })

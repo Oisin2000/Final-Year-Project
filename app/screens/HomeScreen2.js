@@ -12,19 +12,16 @@ import {
   FlatList,
   Alert
 } from 'react-native';
-
-
 import AppButton from '../components/AppButton';
-
 import HomeScreenTile from '../components/HomeScreenTile';
-
 import { Dropdown } from 'react-native-element-dropdown';
 import ListItemFriends from '../components/ListItemFriends';
-import colours from '../config/colours';
 import HomeScreenTile2 from '../components/HomeScreenTile2';
-
+import colours from '../config/colours';
 
 function HomeScreen2(props) {
+
+  
 
     const TMDB_API_KEY = '9d238a902ba51bf41bc13aded64d7960';
     const TRENDING_MOVIES_URL = `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_API_KEY}`;
@@ -59,7 +56,7 @@ function HomeScreen2(props) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://172.20.10.2:5000/friends');
+        const response = await fetch('https://thawing-shore-72198.herokuapp.com/friends');
         if (response.ok) {
           const data = await response.json();
           setFriends(data);
@@ -390,7 +387,7 @@ const styles = StyleSheet.create({
       },
       title: {
         fontSize: 40,
-      fontFamily:'Avenir',
+      
         fontWeight: '600',
         color: colours.white,
         marginTop:75,
@@ -469,14 +466,14 @@ const styles = StyleSheet.create({
       },
 
       tileTitle: {
-        fontSize: 30,
+        fontSize: 35,
         fontWeight: '500',
         marginBottom: 10,
         color:colours.white
       },
 
       tileText: {
-        fontSize: 18,
+        fontSize: 20,
         marginBottom: 10,
         color:colours.white,
         padding:15

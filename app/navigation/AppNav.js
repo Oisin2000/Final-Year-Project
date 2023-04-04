@@ -26,7 +26,7 @@ import { AuthContext } from '../../context/AuthContext';
         <>
         <OfflineNotice/>
     <NavigationContainer theme={navigationTheme}>
-        {userToken !== null ? <AppNavigator/> : <AuthNavigator/> }
+        {userToken !== null ? <AppNavigator refresh={() => setRefreshKey((prevKey) => prevKey + 1)} /> : <AuthNavigator/> }
     </NavigationContainer>
     </>
     )

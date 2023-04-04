@@ -1,4 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
+import { useState } from 'react';
 import { StyleSheet, Text, View, TouchableHighlight, TouchableOpacity , Button  ,Image, SafeAreaView, Alert} from 'react-native';
 import AppButton from './app/components/AppButton';
 import WelcomeScreen from './app/screens/WelcomeScreen';
@@ -18,20 +19,24 @@ import AppNav from './app/navigation/AppNav';
 import colours from './app/config/colours';
 
 
+
 export default function App() {
 
   
-  
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const netInfo = useNetInfo();
 
   return (
+    
     <AuthProvider>
-      
-        <AppNav/>
-      
+    
+   
+        <AppNav />
+    
+       
     </AuthProvider>
-
+    
   )
 }
 
