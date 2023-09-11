@@ -291,6 +291,9 @@ function WatchListScreen(props) {
             <Text style={styles.modaltext}>Rated: {selectedMovie.rated}</Text>
             <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
             <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
+            <Text style={styles.modaltext}>
+              Rating: {selectedMovie.imdb_rating}
+            </Text>
           </View>
           <View style={styles.buttonContainer}>
             <AppButton

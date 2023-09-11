@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import {
   ImageBackground,
   StyleSheet,
@@ -494,6 +495,8 @@ const styles = StyleSheet.create({
     color: colours.white,
     padding: 15,
     textAlign: "center",
+    borderWidth: 2,
+    borderColor: colours.third,
   },
 
   tileTitle: {

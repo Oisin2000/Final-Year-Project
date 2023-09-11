@@ -169,6 +169,9 @@ function MyMoviesScreen(props) {
             <Text style={styles.modaltext}>Plot: {selectedMovie.plot}</Text>
             <Text style={styles.modaltext}>Awards: {selectedMovie.awards}</Text>
             <Text style={styles.modaltext}>
+              Rating: {selectedMovie.imdb_rating}
+            </Text>
+            <Text style={styles.modaltext}>
               My Review: {state.selected.review}
             </Text>
             <Text style={styles.modaltext}>
